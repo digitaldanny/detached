@@ -44,6 +44,9 @@ TagManager:
   - name: Background
     uniqueID: 3658875349
     locked: 0
+  - name: Spirit
+    uniqueID: 2481241015
+    locked: 0
   - name: Player
     uniqueID: 3978492115
     locked: 0

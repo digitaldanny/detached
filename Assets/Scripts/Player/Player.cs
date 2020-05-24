@@ -5,6 +5,7 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour
 {
+
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
@@ -14,21 +15,27 @@ public class Player : MonoBehaviour
     [SerializeField] float runSpeed = 5f;
 
     [Header("JUMP")]
-    [SerializeField] float[] jumpPower;
+    [SerializeField] float[] jumpPower; // jump power for each jump allowed (useful for double jumping)
     [SerializeField] float secondsBetweenDoubleJump = 0.1f;
+
+    [Header("SPIRIT")]
+    [SerializeField] GameObject spirit;
+    [SerializeField] float launchPower = 10f;
 
     // State
     bool isAlive; // is the player alive?
-    [SerializeField] bool isGrounded; // is the player touching the ground?
-    [SerializeField] int currentNumberJumps; // how many times has the player jumped since leaving the ground?
+    bool isGrounded; // is the player touching the ground?
+    bool isFrozen; // is the player able to move?
+    
+    int currentNumberJumps; // how many times has the player jumped since leaving the ground?
     int maxNumberJumps; // how many jumps is the player allowed to do before touching the ground?
+    
     float allowedJumpTime; // allow the player to jump again after delay. Avoids spamming double jumps.
 
     // Cache
     Rigidbody2D myRigidBody;
     Animator myAnimator;
     Collider2D myCollider2D;
-    float gravityScaleAtStart;
 
     // **********************************************************************
     //                           OVERLOAD METHODS
@@ -40,6 +47,7 @@ public class Player : MonoBehaviour
         currentNumberJumps = 0;
         isAlive = true;
         isGrounded = true;
+        isFrozen = false;
         maxNumberJumps = jumpPower.Length;
         allowedJumpTime = 0;
 
@@ -47,14 +55,24 @@ public class Player : MonoBehaviour
         myRigidBody = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
         myCollider2D = GetComponent<Collider2D>();
-        gravityScaleAtStart = myRigidBody.gravityScale;
     }
 
     void Update()
     {
-        HandleRun(); // check if player is running
-        HandleJump(); // check if player jumped
-        CheckFlipSprite(); // flip sprite depending on X axis move direction
+        // Player movement that can only happen when the player is not frozen.
+        if (!isFrozen)
+        {
+            HandleRun(); // check if player is running
+            HandleJump(); // check if player jumped
+            CheckFlipSprite(); // flip sprite depending on X axis move direction
+            HandleSpiritLaunch(); // handles direction and strength of spirit launch
+        }
+
+        // Stuff that player can do even if frozen.
+        else
+        {
+            FreezePlayer();
+        }    
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -62,7 +80,7 @@ public class Player : MonoBehaviour
         // If landing on the ground:
         //  1. Reset current number of jumps so player can perform double jumps.
         //  2. Update the isGrounded state variable.
-        if (myCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        if (myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
         {
             this.currentNumberJumps = 0;
             this.isGrounded = true;
@@ -73,7 +91,7 @@ public class Player : MonoBehaviour
     {
         // If leaving the ground:
         //  1. Update the isGrounded state variable.
-        if (!myCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        if (!myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
         {
             this.isGrounded = false;
         }
@@ -99,7 +117,7 @@ public class Player : MonoBehaviour
 
         // Tell animator when to play run animator
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) > Mathf.Epsilon;
-        myAnimator.SetBool("Running", playerHasHorizontalSpeed);
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, playerHasHorizontalSpeed);
     }
 
     /* 
@@ -165,5 +183,52 @@ public class Player : MonoBehaviour
             // reverse the current scaling of the x axis
             transform.localScale = new Vector2(Mathf.Sign(myRigidBody.velocity.x), 1f);
         }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleSpiritLaunch, FreezePlayer
+     * -------------------------------------------------------------------
+     * HandleSpiritLaunch:
+     * Launches spirit towards the mouse and stops player from being able
+     * to move until a signal is sent to allow the player to control the
+     * character again.
+     * -------------------------------------------------------------------
+     * FrezePlayer:
+     * Sets the player's X velocity to 0 so player isn't stuck moving
+     * left or right while frozen.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void HandleSpiritLaunch()
+    {
+        // Check if the player clicked the fire button
+        if (!CrossPlatformInputManager.GetButtonDown("Fire1"))
+            return;
+
+        // Do not allow the player to move after launching the spirit
+        isFrozen = true;
+
+        // Instantiate the detached spirit into the hierarchy.
+        GameObject spiritLaunched = Instantiate(
+            spirit, 
+            transform.position, 
+            Quaternion.identity
+        ) as GameObject;
+
+        // Get the target vector
+        Vector2 targetPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
+        Vector2 myPos = transform.position;
+        Vector2 direction = (targetPos - myPos);
+        direction.Normalize();
+
+        // Launch the spirit towards where the cursor was aiming.
+        Rigidbody2D spiritRigidBody = spiritLaunched.gameObject.GetComponent<Rigidbody2D>();
+        spiritRigidBody.velocity += direction*launchPower;
+    }
+
+    private void FreezePlayer()
+    {
+        myRigidBody.velocity = new Vector2(0f, myRigidBody.velocity.y);
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, false);
     }
 }
