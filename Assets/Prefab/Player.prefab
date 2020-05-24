@@ -155,4 +155,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
-  jumpPower: 24
+  jumpPower:
+  - 18
+  - 24
+  secondsBetweenDoubleJump: 0.15
+  isGrounded: 0
+  currentNumberJumps: 0
