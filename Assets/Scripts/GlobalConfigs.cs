@@ -7,6 +7,10 @@
     public const string CONTROLLER_HORIZONTAL = "Horizontal";
     public const string CONTROLLER_VERTICAL = "Vertical";
 
+    // Tags
+    public const string TAG_PLAYER = "PlayerTag";
+    public const string TAG_SPIRIT = "SpiritTag";
+
     // Sorting layer
     public const string LAYER_SORTING_BACKGROUND = "Background";
     public const string LAYER_SORTING_SPIRIT = "Spirit";

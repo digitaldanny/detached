@@ -19,25 +19,44 @@ public class CameraManager : MonoBehaviour
     }
 
     // **********************************************************************
+    //                           CLASS STRUCTS
+    // **********************************************************************
+
+    /*
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: vCam
+     * @cam
+     *  Cinemachine virtual camera.
+     * @defaultPriority
+     *  Default priority to set camera when returning from tempororary
+     *  high priority.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+
+    [System.Serializable]
+    public class vCam
+    {
+        public GameObject cam;
+        public int defaultPriority;
+    }
+
+    // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
 
     // Configs
     [Header("VIRTUAL CAMERAS")]
-    [SerializeField] GameObject playerVirtualCam;
-    [SerializeField] int playerVirtualCamPriority = 10;
-
-    [SerializeField] GameObject spiritsVirtualCam;
-    [SerializeField] int spiritVirtualCamPriority = 9;
+    [SerializeField] vCam playerCamSystem;
+    [SerializeField] vCam spiritCamSystem;
 
     [Header("OTHER")]
     [SerializeField] int maxCameraPriority = 100;
 
-    [Header("DEBUG TOOLS")]
+    [Header("DEBUG TOOLS")] 
     [SerializeField] bool debugToolEnabled = false;
     [SerializeField] CameraLabel debugCamera = CameraLabel.CAM_PLAYER;
 
-    // StateW
+    // State
     CameraLabel debugCameraPrevious;
 
     // Cache
@@ -66,36 +85,48 @@ public class CameraManager : MonoBehaviour
      * be in use by setting priority to max.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public bool SetSpiritCamera(bool enabled)
+    public void SetCameraSystem(CameraLabel selectedSystem, bool setting)
     {
-        if (enabled == true)
+        switch (selectedSystem)
         {
-            spiritsVirtualCam.GetComponent<CinemachineVirtualCamera>().Priority = maxCameraPriority;
-        }
-        else
-        {
-            spiritsVirtualCam.GetComponent<CinemachineVirtualCamera>().Priority = spiritVirtualCamPriority;
-        }
+            case CameraLabel.CAM_PLAYER:
 
-        // set the system to be on (only useful if using the priority system)
-        // playerVirtualCam.SetActive(enabled);
-        return true;
+                // If enabling, set player cam to max priority
+                // Else, return player cam to default settings
+                if (enabled == true)
+                    playerCamSystem.cam.GetComponent<CinemachineStateDrivenCamera>().Priority = maxCameraPriority;
+                else
+                    playerCamSystem.cam.GetComponent<CinemachineStateDrivenCamera>().Priority = playerCamSystem.defaultPriority;
+                break;
+
+
+            case CameraLabel.CAM_SPIRIT:
+
+                // If enabling, set spirit cam to max priority
+                // Else, return spirit cam to default settings
+                if (setting == true)
+                    spiritCamSystem.cam.GetComponent<CinemachineVirtualCamera>().Priority = this.maxCameraPriority;
+                else
+                    spiritCamSystem.cam.GetComponent<CinemachineVirtualCamera>().Priority = spiritCamSystem.defaultPriority;
+                break;
+
+
+            default:
+                Debug.Log("Selected camera is not handled.");
+                break;
+        }
     }
 
-    public bool SetPlayerCamera(bool enabled)
+    public void SetSpiritCamera(bool setting)
     {
-        if (enabled == true)
-        {
-            playerVirtualCam.GetComponent<CinemachineStateDrivenCamera>().Priority = maxCameraPriority;
-        }
-        else
-        {
-            playerVirtualCam.GetComponent<CinemachineStateDrivenCamera>().Priority = spiritVirtualCamPriority;
-        }
+        SetCameraSystem(CameraLabel.CAM_SPIRIT, true);
+        SetCameraSystem(CameraLabel.CAM_PLAYER, false);
+    }
 
-        // set the system to be on (only useful if using the priority system)
-        // playerVirtualCam.SetActive(enabled);
-        return true;
+    public void SetPlayerCamera(bool enabled)
+    {
+        SetCameraSystem(CameraLabel.CAM_PLAYER, true);
+        SetCameraSystem(CameraLabel.CAM_SPIRIT, false);
     }
 
     // **********************************************************************
@@ -113,7 +144,7 @@ public class CameraManager : MonoBehaviour
     */
     public void SetSpiritToFollow(Transform spirit)
     {
-        CinemachineVirtualCamera vcam = spiritsVirtualCam.GetComponent<CinemachineVirtualCamera>();
+        CinemachineVirtualCamera vcam = spiritCamSystem.cam.GetComponent<CinemachineVirtualCamera>();
         vcam.Follow = spirit;
     }
 

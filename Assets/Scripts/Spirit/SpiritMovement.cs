@@ -112,12 +112,12 @@ public class SpiritMovement : MonoBehaviour
         // Check if player presses teleport button
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
         {
+            // Set camera to player before deleting spirit
+            cameraManager.SetPlayerCamera(true);
+
             // Teleport player to this location
             Player player = gameObject.GetComponentInParent<Player>();
             player.TeleportHere(transform.position);
-
-            // Set camera to player before deleting spirit
-            cameraManager.SetPlayerCamera(true);
 
             // Destroy spirit to show that player recombined with it
             Destroy(gameObject);

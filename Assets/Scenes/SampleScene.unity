@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 368102715}
   m_Layer: 0
   m_Name: Spirit Cameras
-  m_TagString: CinemachineCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1077,7 +1077,7 @@ GameObject:
   - component: {fileID: 2954932063565624269}
   m_Layer: 0
   m_Name: Player Cameras
-  m_TagString: CinemachineCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1128,10 +1128,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cebed959954dbf54d82ec3d46e7d876e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerVirtualCam: {fileID: 2954932063565624270}
-  playerVirtualCamPriority: 10
-  spiritsVirtualCam: {fileID: 368102712}
-  spiritVirtualCamPriority: 9
+  playerCamSystem:
+    cam: {fileID: 2954932063565624270}
+    defaultPriority: 10
+  spiritCamSystem:
+    cam: {fileID: 368102712}
+    defaultPriority: 9
   maxCameraPriority: 100
   debugToolEnabled: 0
   debugCamera: 1

@@ -312,8 +312,9 @@ public class Player : MonoBehaviour
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: TeleportUndo
-     * Teleports to the player's previous location if the sport is still
-     * valid.
+     * 1. Teleports to the player's previous location if the sport is still
+     *  valid.
+     * 2. Set player camera.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     private void HandleTeleportUndo()
@@ -339,6 +340,7 @@ public class Player : MonoBehaviour
      * SUMMARY: TeleportHere
      * 1. Teleports the player to the specified location.
      * 2. Updates the previousTeleportLocation with valid and new location.
+     * 3. Set player cameras.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     public void TeleportHere(Vector2 location)
