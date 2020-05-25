@@ -8,7 +8,10 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    public enum cameraLabels : int
+    // **********************************************************************
+    //                           CLASS ENUMS
+    // **********************************************************************
+    public enum CameraLabel : int
     {
         CAM_PLAYER = 1,
         CAM_SPIRIT = 2,
@@ -32,10 +35,10 @@ public class CameraManager : MonoBehaviour
 
     [Header("DEBUG TOOLS")]
     [SerializeField] bool debugToolEnabled = false;
-    [SerializeField] cameraLabels debugCamera = cameraLabels.CAM_PLAYER;
+    [SerializeField] CameraLabel debugCamera = CameraLabel.CAM_PLAYER;
 
     // StateW
-    cameraLabels debugCameraPrevious;
+    CameraLabel debugCameraPrevious;
 
     // Cache
 
@@ -45,7 +48,7 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {
-        debugCameraPrevious = cameraLabels.NONE;
+        debugCameraPrevious = CameraLabel.NONE;
 
         // Follow player by default
         SetPlayerCamera(true);
@@ -65,7 +68,6 @@ public class CameraManager : MonoBehaviour
     */
     public bool SetSpiritCamera(bool enabled)
     {
-        Debug.Log("Setting spirit camera");
         if (enabled == true)
         {
             spiritsVirtualCam.GetComponent<CinemachineVirtualCamera>().Priority = maxCameraPriority;
@@ -82,8 +84,6 @@ public class CameraManager : MonoBehaviour
 
     public bool SetPlayerCamera(bool enabled)
     {
-        Debug.Log("Setting player camera");
-
         if (enabled == true)
         {
             playerVirtualCam.GetComponent<CinemachineStateDrivenCamera>().Priority = maxCameraPriority;
@@ -130,18 +130,18 @@ public class CameraManager : MonoBehaviour
     private void DebugCameraSwitcherTool()
     {
         // Only set priority if the camera has not been set already.
-        bool switchable = (debugCamera != debugCameraPrevious) || debugCamera == cameraLabels.NONE;
+        bool switchable = (debugCamera != debugCameraPrevious) || debugCamera == CameraLabel.NONE;
 
         if (debugToolEnabled && switchable)
         {
             switch (debugCamera)
             {
-                case cameraLabels.CAM_SPIRIT:
+                case CameraLabel.CAM_SPIRIT:
                     SetSpiritCamera(true);
                     SetPlayerCamera(false);
                     break;
 
-                case cameraLabels.CAM_PLAYER:
+                case CameraLabel.CAM_PLAYER:
                     SetPlayerCamera(true);
                     SetSpiritCamera(false);
                     break;

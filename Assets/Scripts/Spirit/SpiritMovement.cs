@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class SpiritMovement : MonoBehaviour
 {
@@ -15,6 +12,7 @@ public class SpiritMovement : MonoBehaviour
     CameraManager SpiritCamera;
 
     // State
+    bool isGrounded;
 
     // Cache
     Rigidbody2D myRigidbody;
@@ -29,6 +27,10 @@ public class SpiritMovement : MonoBehaviour
 
     void Start()
     {
+        // set up states
+        isGrounded = false;
+
+        // set up cache
         myRigidbody = GetComponent<Rigidbody2D>();
         myBodyCollider = GetComponent<CapsuleCollider2D>();
         myFloorCollider = GetComponent<BoxCollider2D>();
@@ -38,6 +40,11 @@ public class SpiritMovement : MonoBehaviour
         // switch to spirit camera
         cameraManager.SetSpiritToFollow(transform);
         cameraManager.SetSpiritCamera(true);
+    }
+
+    private void Update()
+    {
+        HandlePlayerTeleport();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -76,6 +83,9 @@ public class SpiritMovement : MonoBehaviour
             myBodyCollider.enabled = false;
             myFloorCollider.enabled = false;
 
+            // Change state to grounded so player will automatically teleport here.
+            isGrounded = true;
+
             // Force spirit to stick to ground at the contact point
             // Also, offset the y position by the sprite's y extent.
             float spriteExtentY = spriteRenderer.sprite.bounds.extents.y;
@@ -87,6 +97,30 @@ public class SpiritMovement : MonoBehaviour
             // Play hitting floor sound
 
             // Start animation
+        }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandlePlayerTeleport
+     * If the spirit has landed on the ground, the spirit teleports the
+     * player to the spirit's current location and then destroys itself.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void HandlePlayerTeleport()
+    {
+        // Check if player presses teleport button
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
+        {
+            // Teleport player to this location
+            Player player = gameObject.GetComponentInParent<Player>();
+            player.TeleportHere(transform.position);
+
+            // Set camera to player before deleting spirit
+            cameraManager.SetPlayerCamera(true);
+
+            // Destroy spirit to show that player recombined with it
+            Destroy(gameObject);
         }
     }
 }

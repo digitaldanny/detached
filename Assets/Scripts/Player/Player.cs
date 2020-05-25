@@ -1,39 +1,109 @@
 ﻿using System;
-using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour
 {
+    // **********************************************************************
+    //                          CLASS STRUCTURES
+    // **********************************************************************
+
+    /*
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: TeleportPoint
+     * @valid
+     *  Is the player allowed to teleport to the point?
+     * @worldLocation
+     *  Transform position to teleport to.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    class TeleportPoint
+    {
+        public bool valid;
+        public Vector2 location;
+
+        // default constructor
+        public TeleportPoint()
+        {
+            valid = false;
+            location = new Vector2(0f, 0f);
+        }
+    }
 
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
+
+    /*
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * CLASS PARAMETER DESCRIPTIONS
+     * -------------------------------------------------------------------
+     * CONFIGS:
+     * @runSpeed
+     *  .
+     * @jumpPower
+     *  Jump power for each jump allowed (useful for double jumping).
+     * @secondsBetweenDoubleJump:
+     *  .
+     * @spirit
+     *  .
+     * @launchPower
+     *  .
+     * @verticalLaunchOffset
+     *  Offset from player at launch so there isn't an instant floor collision.
+     * @maxTimeInSpiritForm
+     *  Time that user is allowed to stay in spirit form.
+     * @spiritRechargeDelay
+     *  Time between recharges in seconds.
+     * @spiritRechargeAmount
+     *  Amount of time to recharge spirit after every spiritRechargeDelay.
+     * -------------------------------------------------------------------
+     * STATES
+     * @isAlive
+     *  Is the player alive?
+     * @isGrounded
+     *  Is the player touching the ground?
+     * @isFrozen
+     *  Is the player able to move?
+     * @currentNumberJumps
+     *  How many times has the player jumped since leaving the ground?
+     * @maxNumberJumps
+     *  How many jumps is the player allowed to do before touching the ground?
+     *  This is based on how many jumpPowers are defined in config variables.
+     * @allowedJumpTime
+     *  Allow the player to jump again after delay. Avoids spamming double jumps.
+     * @previousTeleportPoint
+     *  Keeps track of previous position that the player teleported from so the 
+     *  player can return.
+     * -------------------------------------------------------------------
+     * CACHE
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
 
     // Configs
     [Header("RUN")]
     [SerializeField] float runSpeed = 5f;
 
     [Header("JUMP")]
-    [SerializeField] float[] jumpPower; // jump power for each jump allowed (useful for double jumping)
+    [SerializeField] float[] jumpPower;
     [SerializeField] float secondsBetweenDoubleJump = 0.1f;
 
     [Header("SPIRIT")]
     [SerializeField] GameObject spirit;
     [SerializeField] float launchPower = 10f;
-    [SerializeField] float verticalLaunchOffset = 0.5f; // Offset from player at launch so there isn't 
-                                                        // an instant floor collision.
+    [SerializeField] float verticalLaunchOffset = 0.5f;
+    [SerializeField] float maxTimeInSpiritForm = 5f; 
+    [SerializeField] float spiritRechargeDelay = 2f; 
+    [SerializeField] float spiritRechargeAmount = 0.5f;
 
     // State
-    bool isAlive; // is the player alive?
-    bool isGrounded; // is the player touching the ground?
-    bool isFrozen; // is the player able to move?
-    
-    int currentNumberJumps; // how many times has the player jumped since leaving the ground?
-    int maxNumberJumps; // how many jumps is the player allowed to do before touching the ground?
-    
-    float allowedJumpTime; // allow the player to jump again after delay. Avoids spamming double jumps.
+    bool isAlive;
+    bool isGrounded;
+    bool isFrozen; 
+    int currentNumberJumps; 
+    int maxNumberJumps; 
+    float allowedJumpTime; 
+    TeleportPoint prevTeleportPoint; 
 
     // Cache
     Rigidbody2D myRigidBody;
@@ -53,6 +123,7 @@ public class Player : MonoBehaviour
         isFrozen = false;
         maxNumberJumps = jumpPower.Length;
         allowedJumpTime = 0;
+        prevTeleportPoint = new TeleportPoint();
 
         // Set up cache
         myRigidBody = GetComponent<Rigidbody2D>();
@@ -65,6 +136,7 @@ public class Player : MonoBehaviour
         // Player movement that can only happen when the player is not frozen.
         if (!isFrozen)
         {
+            HandleTeleportUndo(); // check if player is trying to teleport to previous location
             HandleRun(); // check if player is running
             HandleJump(); // check if player jumped
             CheckFlipSprite(); // flip sprite depending on X axis move direction
@@ -101,7 +173,7 @@ public class Player : MonoBehaviour
     }
 
     // **********************************************************************
-    //                         METHODS / COROUTINES
+    //                      PRIVATE METHODS / COROUTINES
     // **********************************************************************
 
     /* 
@@ -111,7 +183,7 @@ public class Player : MonoBehaviour
     */
     private void HandleRun()
     {
-        float controlThrow = CrossPlatformInputManager.GetAxis("Horizontal"); // left to right = -1 to +1
+        float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_HORIZONTAL); // left to right = -1 to +1
 
         // hardcoding y to 0 would make jump buggy
         Vector2 playerVelocity = new Vector2(controlThrow*runSpeed, myRigidBody.velocity.y); 
@@ -139,7 +211,7 @@ public class Player : MonoBehaviour
     private void HandleJump()
     {
         // Check if player has pressed the jump button
-        if (CrossPlatformInputManager.GetButtonDown("Jump"))
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_JUMP))
         {
             // Check if the player has met the delay requirement between jumps.
             // If he has, update the allowed jump time again for future jumps.
@@ -204,17 +276,19 @@ public class Player : MonoBehaviour
     private void HandleSpiritLaunch()
     {
         // Check if the player clicked the fire button
-        if (!CrossPlatformInputManager.GetButtonDown("Fire1"))
+        if (!CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE1))
             return;
 
         // Do not allow the player to move after launching the spirit
         FreezePlayer();
 
-        // Instantiate the detached spirit into the hierarchy.
+        // Instantiate the detached spirit into the hierarchy as a child of
+        // player GameObject.
         GameObject spiritLaunched = Instantiate(
             spirit,
             transform.position + new Vector3(0f, verticalLaunchOffset, 0f),
-            Quaternion.identity
+            Quaternion.identity,
+            transform
         ) as GameObject;
 
         // Get the target vector
@@ -233,5 +307,55 @@ public class Player : MonoBehaviour
         this.isFrozen = true;
         myRigidBody.velocity = new Vector2(0f, myRigidBody.velocity.y);
         myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, false);
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: TeleportUndo
+     * Teleports to the player's previous location if the sport is still
+     * valid.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void HandleTeleportUndo()
+    {
+        // Check if player presses teleport button
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
+        {
+            // check if teleport point is still valid
+            if (this.prevTeleportPoint.valid)
+            {
+                this.prevTeleportPoint.valid = false; // make sure players can't teleport to same location twice
+                transform.position = this.prevTeleportPoint.location; // teleport
+            }
+        }
+    }
+
+    // **********************************************************************
+    //                      PUBLIC METHODS / COROUTINES
+    // **********************************************************************
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: TeleportHere
+     * 1. Teleports the player to the specified location.
+     * 2. Updates the previousTeleportLocation with valid and new location.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public void TeleportHere(Vector2 location)
+    {
+        // save current location as the previous teleport point in case player
+        // tries to teleport back.
+        this.prevTeleportPoint.valid = true;
+        this.prevTeleportPoint.location = transform.position;
+
+        // play teleportation animation
+
+        // play teleportation sound
+
+        // teleport to the requested location
+        transform.position = location;
+
+        // enable player movement again
+        this.isFrozen = false;
     }
 }
