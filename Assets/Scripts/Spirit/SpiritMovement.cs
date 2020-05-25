@@ -11,6 +11,8 @@ public class SpiritMovement : MonoBehaviour
     // **********************************************************************
 
     // Configs
+    CameraManager playerCamera;
+    CameraManager SpiritCamera;
 
     // State
 

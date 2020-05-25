@@ -154,7 +154,6 @@ public class Player : MonoBehaviour
             // max number of jumps already.
             if (this.isGrounded || this.currentNumberJumps < this.maxNumberJumps)
             {
-                Debug.Log(this.jumpPower[currentNumberJumps]);
                 Jump(this.jumpPower[currentNumberJumps]);
             }
         }
