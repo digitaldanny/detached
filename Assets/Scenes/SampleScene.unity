@@ -14943,12 +14943,12 @@ PrefabInstance:
     - target: {fileID: 4022419655058528314, guid: da86196f508cb614cbb98e7d92272137,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.94
+      value: 7.64
       objectReference: {fileID: 0}
     - target: {fileID: 4022419655058528314, guid: da86196f508cb614cbb98e7d92272137,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.83
+      value: 4.33
       objectReference: {fileID: 0}
     - target: {fileID: 4022419655058528314, guid: da86196f508cb614cbb98e7d92272137,
         type: 3}
@@ -15076,6 +15076,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200153248835474865, guid: 10172366ffb9653438aaa69f081c39cc,
         type: 3}
+      propertyPath: m_Instructions.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6200153248835474865, guid: 10172366ffb9653438aaa69f081c39cc,
+        type: 3}
       propertyPath: m_AnimatedTarget
       value: 
       objectReference: {fileID: 233120279}
@@ -15087,6 +15092,16 @@ PrefabInstance:
     - target: {fileID: 6200153248835474865, guid: 10172366ffb9653438aaa69f081c39cc,
         type: 3}
       propertyPath: m_Instructions.Array.data[1].m_VirtualCamera
+      value: 
+      objectReference: {fileID: 134410332}
+    - target: {fileID: 6200153248835474865, guid: 10172366ffb9653438aaa69f081c39cc,
+        type: 3}
+      propertyPath: m_Instructions.Array.data[2].m_FullHash
+      value: 1432961145
+      objectReference: {fileID: 0}
+    - target: {fileID: 6200153248835474865, guid: 10172366ffb9653438aaa69f081c39cc,
+        type: 3}
+      propertyPath: m_Instructions.Array.data[2].m_VirtualCamera
       value: 
       objectReference: {fileID: 134410332}
     - target: {fileID: 6200153249017244231, guid: 10172366ffb9653438aaa69f081c39cc,

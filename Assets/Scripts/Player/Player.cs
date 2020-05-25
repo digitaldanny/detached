@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
@@ -21,6 +22,8 @@ public class Player : MonoBehaviour
     [Header("SPIRIT")]
     [SerializeField] GameObject spirit;
     [SerializeField] float launchPower = 10f;
+    [SerializeField] float verticalLaunchOffset = 0.5f; // Offset from player at launch so there isn't 
+                                                        // an instant floor collision.
 
     // State
     bool isAlive; // is the player alive?
@@ -71,7 +74,7 @@ public class Player : MonoBehaviour
         // Stuff that player can do even if frozen.
         else
         {
-            FreezePlayer();
+
         }    
     }
 
@@ -206,12 +209,12 @@ public class Player : MonoBehaviour
             return;
 
         // Do not allow the player to move after launching the spirit
-        isFrozen = true;
+        FreezePlayer();
 
         // Instantiate the detached spirit into the hierarchy.
         GameObject spiritLaunched = Instantiate(
-            spirit, 
-            transform.position, 
+            spirit,
+            transform.position + new Vector3(0f, verticalLaunchOffset, 0f),
             Quaternion.identity
         ) as GameObject;
 
@@ -228,6 +231,7 @@ public class Player : MonoBehaviour
 
     private void FreezePlayer()
     {
+        this.isFrozen = true;
         myRigidBody.velocity = new Vector2(0f, myRigidBody.velocity.y);
         myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, false);
     }
