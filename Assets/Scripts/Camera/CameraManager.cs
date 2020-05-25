@@ -34,7 +34,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] bool debugToolEnabled = false;
     [SerializeField] cameraLabels debugCamera = cameraLabels.CAM_PLAYER;
 
-    // State
+    // StateW
     cameraLabels debugCameraPrevious;
 
     // Cache
@@ -46,6 +46,9 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         debugCameraPrevious = cameraLabels.NONE;
+
+        // Follow player by default
+        SetPlayerCamera(true);
     }
 
     private void Update()
@@ -131,7 +134,6 @@ public class CameraManager : MonoBehaviour
 
         if (debugToolEnabled && switchable)
         {
-            Debug.Log("Swithcingt cameras.");
             switch (debugCamera)
             {
                 case cameraLabels.CAM_SPIRIT:

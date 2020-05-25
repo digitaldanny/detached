@@ -21,6 +21,7 @@ public class SpiritMovement : MonoBehaviour
     CapsuleCollider2D myBodyCollider;
     BoxCollider2D myFloorCollider;
     SpriteRenderer spriteRenderer;
+    CameraManager cameraManager;
 
     // **********************************************************************
     //                           OVERLOAD METHODS
@@ -32,6 +33,11 @@ public class SpiritMovement : MonoBehaviour
         myBodyCollider = GetComponent<CapsuleCollider2D>();
         myFloorCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        cameraManager = FindObjectOfType<CameraManager>();
+
+        // switch to spirit camera
+        cameraManager.SetSpiritToFollow(transform);
+        cameraManager.SetSpiritCamera(true);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
