@@ -92,7 +92,8 @@ public class Player : MonoBehaviour
     [SerializeField] float runAcceleration = 1f;
 
     [Header("JUMP")]
-    [SerializeField] float[] jumpPower;
+    [SerializeField] float[] jumpSpeed;
+    [SerializeField] float fallSpeed = 5f;
     [SerializeField] float secondsBetweenDoubleJump = 0.1f;
 
     [Header("SPIRIT")]
@@ -128,7 +129,7 @@ public class Player : MonoBehaviour
         isAlive = true;
         isGrounded = true;
         isFrozen = false;
-        maxNumberJumps = jumpPower.Length;
+        maxNumberJumps = jumpSpeed.Length;
         allowedJumpTime = 0;
         prevTeleportPoint = new TeleportPoint();
 
@@ -150,11 +151,14 @@ public class Player : MonoBehaviour
             HandleSpiritLaunch(); // handles direction and strength of spirit launch
         }
 
-        // Stuff that player can do even if frozen.
+        // Stuff that player should only do if frozen.
         else
         {
 
-        }    
+        }
+
+        // Stuff player should do whether frozen or not.
+        FallMultiplier(); // if player is falling, add more velocity toward ground
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -235,7 +239,7 @@ public class Player : MonoBehaviour
             // max number of jumps already.
             if (this.isGrounded || this.currentNumberJumps < this.maxNumberJumps)
             {
-                Jump(this.jumpPower[currentNumberJumps]);
+                Jump(this.jumpSpeed[currentNumberJumps]);
             }
         }
     }
@@ -337,6 +341,22 @@ public class Player : MonoBehaviour
                 this.prevTeleportPoint.valid = false; // make sure players can't teleport to same location twice
                 transform.position = this.prevTeleportPoint.location; // teleport
             }
+        }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: FallMultiplier
+     * If the player begins falling, this function adds the fallSpeed 
+     * multiplier
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void FallMultiplier()
+    {
+        // only apply falling multiplier if player is already falling
+        if (myRigidBody.velocity.y < Mathf.Epsilon)
+        {
+            myRigidBody.velocity += Vector2.down * fallSpeed * Time.deltaTime;
         }
     }
 

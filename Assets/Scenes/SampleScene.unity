@@ -266,20 +266,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -4821783338817125939, guid: 8119e8f0a181103428f0853753ea401b,
-        type: 3}
-      propertyPath: m_GravityScale
-      value: 1.65
-      objectReference: {fileID: 0}
     - target: {fileID: 2394427988979978083, guid: 8119e8f0a181103428f0853753ea401b,
         type: 3}
-      propertyPath: maxRunSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2394427988979978083, guid: 8119e8f0a181103428f0853753ea401b,
-        type: 3}
-      propertyPath: runAcceleration
+      propertyPath: jumpSpeed.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394427988979978083, guid: 8119e8f0a181103428f0853753ea401b,
+        type: 3}
+      propertyPath: fallSpeed
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394427988979978083, guid: 8119e8f0a181103428f0853753ea401b,
+        type: 3}
+      propertyPath: jumpSpeed.Array.data[0]
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394427988979978083, guid: 8119e8f0a181103428f0853753ea401b,
+        type: 3}
+      propertyPath: jumpSpeed.Array.data[1]
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
         type: 3}
