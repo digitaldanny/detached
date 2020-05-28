@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor.U2D.Path.GUIFramework;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
@@ -13,20 +14,25 @@ public class Player : MonoBehaviour
      * SUMMARY: TeleportPoint
      * @valid
      *  Is the player allowed to teleport to the point?
-     * @worldLocation
+     * @location
      *  Transform position to teleport to.
+     * @velocity
+     *  Velocity that the spirit was traveling at when player chose to 
+     *  teleport.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     class TeleportPoint
     {
         public bool valid;
         public Vector2 location;
+        public Vector2 velocity;
 
         // default constructor
         public TeleportPoint()
         {
             valid = false;
             location = new Vector2(0f, 0f);
+            velocity = new Vector2(0f, 0f);
         }
     }
 
@@ -82,7 +88,8 @@ public class Player : MonoBehaviour
 
     // Configs
     [Header("RUN")]
-    [SerializeField] float runSpeed = 5f;
+    [SerializeField] float maxRunSpeed = 5f;
+    [SerializeField] float runAcceleration = 1f;
 
     [Header("JUMP")]
     [SerializeField] float[] jumpPower;
@@ -102,8 +109,8 @@ public class Player : MonoBehaviour
     bool isFrozen; 
     int currentNumberJumps; 
     int maxNumberJumps; 
-    float allowedJumpTime; 
-    TeleportPoint prevTeleportPoint; 
+    float allowedJumpTime;
+    TeleportPoint prevTeleportPoint;
 
     // Cache
     Rigidbody2D myRigidBody;
@@ -185,13 +192,15 @@ public class Player : MonoBehaviour
     {
         float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_HORIZONTAL); // left to right = -1 to +1
 
-        // hardcoding y to 0 would make jump buggy
-        Vector2 playerVelocity = new Vector2(controlThrow*runSpeed, myRigidBody.velocity.y); 
+        // Calculate new velocity using acceleration with a max run speed
+        float xVelocity = myRigidBody.velocity.x + controlThrow * this.runAcceleration;
+        float xVelocityClamped = Mathf.Clamp(xVelocity, -1f*this.maxRunSpeed, this.maxRunSpeed);
+        Vector2 playerVelocity = new Vector2(xVelocityClamped, myRigidBody.velocity.y);
 
-        myRigidBody.velocity = playerVelocity;
+        myRigidBody.velocity = playerVelocity; // assign new run speed to player
 
         // Tell animator when to play run animator
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) > Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) >= GlobalConfigs.Epsilon;
         myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, playerHasHorizontalSpeed);
     }
 
@@ -249,7 +258,7 @@ public class Player : MonoBehaviour
     */
     private void CheckFlipSprite()
     {
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) > Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) > GlobalConfigs.Epsilon;
 
         // if player is moving horizontally
         if (playerHasHorizontalSpeed)
@@ -343,7 +352,7 @@ public class Player : MonoBehaviour
      * 3. Set player cameras.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void TeleportHere(Vector2 location)
+    public void TeleportHere(Vector2 location, Vector2 velocity)
     {
         // save current location as the previous teleport point in case player
         // tries to teleport back.
@@ -354,8 +363,9 @@ public class Player : MonoBehaviour
 
         // play teleportation sound
 
-        // teleport to the requested location
+        // teleport to the requested location and add the requested velocity
         transform.position = location;
+        myRigidBody.velocity = velocity;
 
         // enable player movement again
         this.isFrozen = false;

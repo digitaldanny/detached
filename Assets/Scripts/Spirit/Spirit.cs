@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
-public class SpiritMovement : MonoBehaviour
+public class Spirit : MonoBehaviour
 {
     // **********************************************************************
     //                          CLASS PARAMETERS
@@ -117,7 +117,7 @@ public class SpiritMovement : MonoBehaviour
 
             // Teleport player to this location
             Player player = gameObject.GetComponentInParent<Player>();
-            player.TeleportHere(transform.position);
+            player.TeleportHere(transform.position, myRigidbody.velocity);
 
             // Destroy spirit to show that player recombined with it
             Destroy(gameObject);

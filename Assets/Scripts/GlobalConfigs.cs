@@ -24,4 +24,7 @@
 
     // Animation
     public const string ANIMATION_RUNNING = "Running";
+
+    // Misc
+    public const float Epsilon = 0.00001f;
 }
