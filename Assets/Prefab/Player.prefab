@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 8874793710004259981}
   - component: {fileID: -4821783338817125939}
   - component: {fileID: -4452010002733407157}
-  - component: {fileID: 2394427988979978083}
+  - component: {fileID: 6166933790860936097}
+  - component: {fileID: -6178063970181459786}
   m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
@@ -142,7 +143,7 @@ CapsuleCollider2D:
   m_Offset: {x: -0.015962899, y: -0.03192568}
   m_Size: {x: 0.51587725, y: 0.81114864}
   m_Direction: 0
---- !u!114 &2394427988979978083
+--- !u!114 &6166933790860936097
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,6 +153,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f431b08392881840bcc29aa5d797993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isControllable: 1
+--- !u!114 &-6178063970181459786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8874793710004259984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efc73f2b940d38840bce420855bd32a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxRunSpeed: 15
