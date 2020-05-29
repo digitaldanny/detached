@@ -151,17 +151,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 8874793710004259984}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0e0be6cc3054d041912ce90009f9fcc, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f431b08392881840bcc29aa5d797993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxRunSpeed: 15
   runAcceleration: 2
-  jumpPower:
-  - 35
+  jumpSpeed:
   - 30
-  secondsBetweenDoubleJump: 0.15
+  - 30
+  fallSpeed: 240
+  secondsBetweenDoubleJump: 0.1
   spirit: {fileID: 4022419655058528293, guid: da86196f508cb614cbb98e7d92272137, type: 3}
-  launchPower: 25
+  launchPower: 30
   verticalLaunchOffset: 0.5
   maxTimeInSpiritForm: 5
   spiritRechargeDelay: 2

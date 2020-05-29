@@ -116,7 +116,7 @@ public class Spirit : MonoBehaviour
             cameraManager.SetPlayerCamera(true);
 
             // Teleport player to this location
-            Player player = gameObject.GetComponentInParent<Player>();
+            UserController player = gameObject.GetComponentInParent<UserController>();
             player.TeleportHere(transform.position, myRigidbody.velocity);
 
             // Destroy spirit to show that player recombined with it

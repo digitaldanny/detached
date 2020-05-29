@@ -1,30 +1,46 @@
 ﻿public static class GlobalConfigs
 {
-    // Controller
+    // **********************************************************************
+    // CONTROLLER
+    // **********************************************************************
     public const string CONTROLLER_FIRE1 = "Fire1";
     public const string CONTROLLER_FIRE2 = "Fire2";
     public const string CONTROLLER_JUMP = "Jump";
     public const string CONTROLLER_HORIZONTAL = "Horizontal";
     public const string CONTROLLER_VERTICAL = "Vertical";
 
-    // Tags
+    // **********************************************************************
+    // TAGS
+    // **********************************************************************
     public const string TAG_PLAYER = "PlayerTag";
     public const string TAG_SPIRIT = "SpiritTag";
 
-    // Sorting layer
+    // **********************************************************************
+    // SORTING LAYER
+    // **********************************************************************
     public const string LAYER_SORTING_BACKGROUND = "Background";
     public const string LAYER_SORTING_SPIRIT = "Spirit";
     public const string LAYER_SORTING_PLAYER = "Player";
     public const string LAYER_SORTING_FOREGROUND = "Foreground";
 
-    // Collision layer
+    // **********************************************************************
+    // COLLISION LAYER
+    // **********************************************************************
     public const string LAYER_COLLISION_BACKGROUND = "Background";
     public const string LAYER_COLLISION_GROUND = "Ground";
     public const string LAYER_COLLISION_PLAYER = "Player";
 
-    // Animation
-    public const string ANIMATION_RUNNING = "Running";
+    // **********************************************************************
+    // ANIMATION
+    // **********************************************************************
 
-    // Misc
+    // player
+    public const string ANIMATION_PLAYER_RUNNING = "Running";
+
+    // enemy
+
+    // **********************************************************************
+    // MISC
+    // **********************************************************************
     public const float Epsilon = 0.00001f;
 }

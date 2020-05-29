@@ -3,7 +3,7 @@ using UnityEditor.U2D.Path.GUIFramework;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
-public class Player : MonoBehaviour
+public class UserController : MonoBehaviour
 {
     // **********************************************************************
     //                          CLASS STRUCTURES
@@ -119,7 +119,7 @@ public class Player : MonoBehaviour
     Collider2D myCollider2D;
 
     // **********************************************************************
-    //                           OVERLOAD METHODS
+    //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
 
     void Start()
@@ -161,7 +161,7 @@ public class Player : MonoBehaviour
         FallMultiplier(); // if player is falling, add more velocity toward ground
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected void OnCollisionEnter2D(Collision2D collision)
     {
         // If landing on the ground:
         //  1. Reset current number of jumps so player can perform double jumps.
@@ -173,7 +173,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionExit2D(Collision2D collision)
+    protected void OnCollisionExit2D(Collision2D collision)
     {
         // If leaving the ground:
         //  1. Update the isGrounded state variable.
@@ -184,7 +184,13 @@ public class Player : MonoBehaviour
     }
 
     // **********************************************************************
-    //                      PRIVATE METHODS / COROUTINES
+    //                     PLAYER CLASS OVERLOAD METHODS
+    // **********************************************************************
+
+
+
+    // **********************************************************************
+    //                      protected METHODS / COROUTINES
     // **********************************************************************
 
     /* 
@@ -192,7 +198,7 @@ public class Player : MonoBehaviour
      * SUMMARY: HandleRun
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void HandleRun()
+    protected void HandleRun()
     {
         float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_HORIZONTAL); // left to right = -1 to +1
 
@@ -205,7 +211,7 @@ public class Player : MonoBehaviour
 
         // Tell animator when to play run animator
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) >= GlobalConfigs.Epsilon;
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, playerHasHorizontalSpeed);
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed);
     }
 
     /* 
@@ -221,7 +227,7 @@ public class Player : MonoBehaviour
      * to jump.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void HandleJump()
+    protected void HandleJump()
     {
         // Check if player has pressed the jump button
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_JUMP))
@@ -244,7 +250,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Jump(float jumpPowerCustom)
+    protected void Jump(float jumpPowerCustom)
     {
         // Add upward force to player so it jumps.
         Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
@@ -260,7 +266,7 @@ public class Player : MonoBehaviour
      * SUMMARY: CheckFlipSprite
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void CheckFlipSprite()
+    protected void CheckFlipSprite()
     {
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidBody.velocity.x) > GlobalConfigs.Epsilon;
 
@@ -286,7 +292,7 @@ public class Player : MonoBehaviour
      * left or right while frozen.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void HandleSpiritLaunch()
+    protected void HandleSpiritLaunch()
     {
         // Check if the player clicked the fire button
         if (!CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE1))
@@ -315,11 +321,11 @@ public class Player : MonoBehaviour
         spiritRigidBody.velocity += direction*launchPower;
     }
 
-    private void FreezePlayer()
+    protected void FreezePlayer()
     {
         this.isFrozen = true;
         myRigidBody.velocity = new Vector2(0f, myRigidBody.velocity.y);
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_RUNNING, false);
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
 
     /* 
@@ -330,7 +336,7 @@ public class Player : MonoBehaviour
      * 2. Set player camera.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void HandleTeleportUndo()
+    protected void HandleTeleportUndo()
     {
         // Check if player presses teleport button
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
@@ -351,7 +357,7 @@ public class Player : MonoBehaviour
      * multiplier
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void FallMultiplier()
+    protected void FallMultiplier()
     {
         // only apply falling multiplier if player is already falling
         if (myRigidBody.velocity.y < Mathf.Epsilon)
