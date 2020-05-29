@@ -18,7 +18,7 @@ public class Entity : MonoBehaviour
      *  teleport.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    class TeleportPoint
+    protected class TeleportPoint
     {
         public bool valid;
         public Vector2 location;
@@ -48,18 +48,6 @@ public class Entity : MonoBehaviour
      *  Jump power for each jump allowed (useful for double jumping).
      * @secondsBetweenDoubleJump:
      *  .
-     * @spirit
-     *  .
-     * @launchPower
-     *  .
-     * @verticalLaunchOffset
-     *  Offset from player at launch so there isn't an instant floor collision.
-     * @maxTimeInSpiritForm
-     *  Time that user is allowed to stay in spirit form.
-     * @spiritRechargeDelay
-     *  Time between recharges in seconds.
-     * @spiritRechargeAmount
-     *  Amount of time to recharge spirit after every spiritRechargeDelay.
      * -------------------------------------------------------------------
      * STATES
      * @isAlive
@@ -85,41 +73,34 @@ public class Entity : MonoBehaviour
 
     // Configs
     [Header("RUN")]
-    [SerializeField] float maxRunSpeed = 15f;
-    [SerializeField] float runAcceleration = 2f;
+    [SerializeField] protected float maxRunSpeed = 15f;
+    [SerializeField] protected float runAcceleration = 2f;
 
     [Header("JUMP")]
-    [SerializeField] float[] jumpSpeed;
-    [SerializeField] float fallSpeed = 240f;
-    [SerializeField] float secondsBetweenDoubleJump = 0.1f;
-
-    [Header("SPIRIT")]
-    [SerializeField] GameObject spirit;
-    [SerializeField] float launchPower = 30f;
-    [SerializeField] float verticalLaunchOffset = 0.5f;
-    [SerializeField] float maxTimeInSpiritForm = 5f;
-    [SerializeField] float spiritRechargeDelay = 2f;
-    [SerializeField] float spiritRechargeAmount = 0.5f;
+    [SerializeField] protected float[] jumpSpeed;
+    [SerializeField] protected float fallSpeed = 240f;
+    [SerializeField] protected float secondsBetweenDoubleJump = 0.1f;
 
     // State
-    bool isAlive;
-    bool isGrounded;
-    bool isFrozen;
-    int currentNumberJumps;
-    int maxNumberJumps;
-    float allowedJumpTime;
-    TeleportPoint prevTeleportPoint;
+    protected bool isAlive;
+    protected bool isGrounded;
+    protected bool isFrozen;
+    protected int currentNumberJumps;
+    protected int maxNumberJumps;
+    protected float allowedJumpTime;
+    protected TeleportPoint prevTeleportPoint;
 
     // Cache
-    Rigidbody2D myRigidbody;
-    Animator myAnimator;
-    Collider2D myCollider2D;
+    protected Rigidbody2D myRigidbody;
+    protected Animator myAnimator;
+    protected Collider2D myCollider2D;
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
 
-    void Start()
+    void Start() { StartE(); }
+    protected void StartE()
     {
         // Set up states
         currentNumberJumps = 0;
@@ -136,12 +117,14 @@ public class Entity : MonoBehaviour
         myCollider2D = GetComponent<Collider2D>();
     }
 
-    private void Update()
+    private void Update() { UpdateE(); }
+    protected void UpdateE()
     {
-        FallMultiplier(); // apply configurable fall speed so player falls to ground quicker 
+        FallMultiplier(); // apply configurable fall speed so player falls to ground quicker
     }
 
-    protected void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision) { OnCollisionEnter2DE(collision); }
+    protected void OnCollisionEnter2DE(Collision2D collision)
     {
         // If landing on the ground:
         //  1. Reset current number of jumps so player can perform double jumps.
@@ -153,7 +136,8 @@ public class Entity : MonoBehaviour
         }
     }
 
-    protected void OnCollisionExit2D(Collision2D collision)
+    private void OnCollisionExit2D(Collision2D collision) { OnCollisionEnter2DE(collision); }
+    protected void OnCollisionExit2DE(Collision2D collision)
     {
         // If leaving the ground:
         //  1. Update the isGrounded state variable.
@@ -184,6 +168,33 @@ public class Entity : MonoBehaviour
         }
     }
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: FreezePlayer
+     * Sets the player's X velocity to 0 so player isn't stuck moving
+     * left or right while frozen.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void FreezePlayer()
+    {
+        this.isFrozen = true;
+        myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: Jump
+     * This function adds upward force to the rigidbody when called.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void Jump(float jumpPowerCustom)
+    {
+        // Add upward force to player so it jumps.
+        Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
+        myRigidbody.velocity += jumpVelocityToAdd;
+    }
+
     // **********************************************************************
     //                      PUBLIC METHODS / COROUTINES
     // **********************************************************************
@@ -193,7 +204,7 @@ public class Entity : MonoBehaviour
       * SUMMARY: HandleRun
       * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      */
-    public void HandleRun(float controlThrow)
+    public virtual void HandleRun(float controlThrow)
     {
         if (isFrozen) { return; }
 
@@ -218,18 +229,12 @@ public class Entity : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleJump, Jump
-     * -------------------------------------------------------------------
-     * HandleJump:
+     * SUMMARY: HandleJump
      * This function checks if the player is trying to jump and calls
      * the jump function if the player is allowed to jump.
-     * -------------------------------------------------------------------
-     * Jump:
-     * This function add the upward force to the player's physics body
-     * to jump.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void HandleJump()
+    public virtual void HandleJump()
     {
         if (isFrozen) { return; }
 
@@ -244,86 +249,40 @@ public class Entity : MonoBehaviour
         // Player is always allowed to jump if touching the ground.
         // If already in the air, player can only jump if he hasn't met the
         // max number of jumps already.
-        if (this.isGrounded || this.currentNumberJumps < this.maxNumberJumps)
+        if (this.currentNumberJumps < this.maxNumberJumps)
         {
             Jump(this.jumpSpeed[currentNumberJumps]);
+
+            // Increment counter to make sure player doesn't make more jumps
+            // in a row than allowed.
+            this.currentNumberJumps++;
         }
     }
 
-    protected void Jump(float jumpPowerCustom)
-    {
-        // Add upward force to player so it jumps.
-        Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
-        myRigidbody.velocity += jumpVelocityToAdd;
-
-        // Increment counter to make sure player doesn't make more jumps
-        // in a row than allowed.
-        this.currentNumberJumps++;
-    }
-
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleSpiritLaunch, FreezePlayer
-     * -------------------------------------------------------------------
-     * HandleSpiritLaunch:
+     * SUMMARY: HandleSpiritLaunch
      * Launches spirit towards the mouse and stops player from being able
      * to move until a signal is sent to allow the player to control the
      * character again.
-     * -------------------------------------------------------------------
-     * FrezePlayer:
-     * Sets the player's X velocity to 0 so player isn't stuck moving
-     * left or right while frozen.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void HandleRanged(Vector2 cursorPos)
+    public virtual void HandleRanged(Vector2 cursorPos)
     {
-        // Do not allow the player to move after launching the spirit
-        FreezePlayer();
-
-        // Instantiate the detached spirit into the hierarchy as a child of
-        // player GameObject.
-        GameObject spiritLaunched = Instantiate(
-            spirit,
-            transform.position + new Vector3(0f, verticalLaunchOffset, 0f),
-            Quaternion.identity,
-            transform
-        ) as GameObject;
-
-        // Get the target vector
-        Vector2 myPos = transform.position;
-        Vector2 direction = (cursorPos - myPos);
-        direction.Normalize();
-
-        // Launch the spirit towards where the cursor was aiming.
-        Rigidbody2D spiritRigidBody = spiritLaunched.gameObject.GetComponent<Rigidbody2D>();
-        spiritRigidBody.velocity += direction * launchPower;
-    }
-
-    protected void FreezePlayer()
-    {
-        this.isFrozen = true;
-        myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
+        Debug.Log("ERROR (Entity.HandleRanged): Method not implemented for base class.");
     }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: TeleportUndo
+     * SUMMARY: HandleSpecial
      * 1. Teleports to the player's previous location if the sport is still
      *  valid.
      * 2. Set player camera.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void HandleSpecial(Vector2 cursorPos)
+    public virtual void HandleSpecial(Vector2 cursorPos)
     {
-        if (isFrozen) { return; }
-
-        // check if teleport point is still valid
-        if (this.prevTeleportPoint.valid)
-        {
-            this.prevTeleportPoint.valid = false; // make sure players can't teleport to same location twice
-            transform.position = this.prevTeleportPoint.location; // teleport
-        }
+        Debug.Log("ERROR (Entity.HandleSpecial): Method not implemented for base class.");
     }
 
     /* 
@@ -334,7 +293,7 @@ public class Entity : MonoBehaviour
      * 3. Set player cameras.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void TeleportHere(Vector2 location, Vector2 velocity)
+    public virtual void TeleportHere(Vector2 location, Vector2 velocity)
     {
         // save current location as the previous teleport point in case player
         // tries to teleport back.

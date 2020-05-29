@@ -10,10 +10,10 @@ public class UserController : MonoBehaviour
     // Configs
 
     // State
-    [SerializeField] bool isControllable; // Serialized for debugging
+    [SerializeField] bool isControllable = false; // Serialized for debugging
 
     // Cache
-    Entity entity; // entity to control
+    [SerializeField] Entity entity; // entity to control
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
@@ -22,7 +22,6 @@ public class UserController : MonoBehaviour
     private void Start()
     {
         entity = GetComponent<Entity>(); // get the first component derived from Entity
-        isControllable = false; // don't allow controlling set
     }
 
     private void Update()
