@@ -81,6 +81,9 @@ public class Entity : MonoBehaviour
     [SerializeField] protected float fallSpeed = 240f;
     [SerializeField] protected float secondsBetweenDoubleJump = 0.1f;
 
+    [Header("SPRITE")]
+    [SerializeField] protected bool spriteFacingRight = true;
+
     // State
     protected bool isAlive;
     protected bool isGrounded;
@@ -94,6 +97,8 @@ public class Entity : MonoBehaviour
     protected Rigidbody2D myRigidbody;
     protected Animator myAnimator;
     protected Collider2D myCollider2D;
+    protected UserController myController;
+    protected SpriteRenderer mySpriteRenderer;
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
@@ -115,6 +120,8 @@ public class Entity : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
         myCollider2D = GetComponent<Collider2D>();
+        myController = GetComponent<UserController>();
+        mySpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update() { UpdateE(); }
@@ -222,8 +229,11 @@ public class Entity : MonoBehaviour
         // check if player's sprite should be flipped to face direction it is moving
         if (playerHasHorizontalSpeed)
         {
-            // reverse the current scaling of the x axis
-            transform.localScale = new Vector2(Mathf.Sign(myRigidbody.velocity.x), 1f);
+            // Sprite direction is implemented using XNOR boolean logic
+            // XNOR Truth table reference: https://en.scratch-wiki.info/wiki/Truth_Table
+            bool A = Mathf.Sign(myRigidbody.velocity.x) <= 0.0f;
+            bool B = this.spriteFacingRight;
+            mySpriteRenderer.flipX = A == B; // XNOR logic
         }
     }
 
@@ -261,10 +271,8 @@ public class Entity : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleSpiritLaunch
-     * Launches spirit towards the mouse and stops player from being able
-     * to move until a signal is sent to allow the player to control the
-     * character again.
+     * SUMMARY: HandleRanged
+     * Ranged attack varies from character to character.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     public virtual void HandleRanged(Vector2 cursorPos)
@@ -275,9 +283,7 @@ public class Entity : MonoBehaviour
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: HandleSpecial
-     * 1. Teleports to the player's previous location if the sport is still
-     *  valid.
-     * 2. Set player camera.
+     * Special ability varies from character to character.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     public virtual void HandleSpecial(Vector2 cursorPos)
@@ -310,5 +316,17 @@ public class Entity : MonoBehaviour
 
         // enable player movement again
         this.isFrozen = false;
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: RequestControl
+     * After calling this function, the UserController will be enabled
+     * and the player will be able to control this game object.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public virtual void SetControl(bool enabled)
+    {
+        myController.SetControllable(enabled);
     }
 }

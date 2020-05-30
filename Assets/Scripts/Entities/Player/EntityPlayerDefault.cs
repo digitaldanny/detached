@@ -49,7 +49,7 @@ public class EntityPlayerDefault : Entity
         base.StartE();
 
         // Players should start the game being able to control the player.
-        GetComponent<UserController>().SetControllable(true);
+        myController.SetControllable(true);
     }
 
     /* 
@@ -63,6 +63,8 @@ public class EntityPlayerDefault : Entity
     */
     public override void HandleRanged(Vector2 cursorPos)
     {
+        if (isFrozen) { return; } // only allow the player to shoot one spirit
+
         // Do not allow the player to move after launching the spirit
         FreezePlayer();
 

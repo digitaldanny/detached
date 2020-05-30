@@ -29,6 +29,7 @@
     public const string LAYER_COLLISION_BACKGROUND = "Background";
     public const string LAYER_COLLISION_GROUND = "Ground";
     public const string LAYER_COLLISION_PLAYER = "Player";
+    public const string LAYER_COLLISION_ENEMY = "Enemy";
 
     // **********************************************************************
     // ANIMATION

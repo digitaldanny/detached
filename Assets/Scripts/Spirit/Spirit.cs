@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class Spirit : MonoBehaviour
@@ -51,14 +52,16 @@ public class Spirit : MonoBehaviour
     {
         foreach (ContactPoint2D contact in collision.contacts)
         {
-            // If this gameObject was hit in the floor collider..
+            // Check if gameObject hit the floor by checking if hit
+            // on the BoxCollider, which is located on the bottom of 
+            // the spirit.
             if (contact.otherCollider is BoxCollider2D)
                 HandleTouchingGround(contact.point);
         }
     }
 
     // **********************************************************************
-    //                         METHODS / COROUTINES
+    //                      PRIVATE METHODS / COROUTINES
     // **********************************************************************
 
     /* 
@@ -121,5 +124,26 @@ public class Spirit : MonoBehaviour
             // Destroy spirit to show that player recombined with it
             Destroy(gameObject);
         }
+    }
+
+    // **********************************************************************
+    //                      PUBLIC METHODS / COROUTINES
+    // **********************************************************************
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleControllingEnemy
+     * This function is called by the enemy that the spirit collided
+     * with so the user can control the enemy.
+     * ~ Destroy spirit game object.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public void TakeControl()
+    {
+        // play animation
+
+        // play sound
+
+        Destroy(gameObject, 0f);
     }
 }

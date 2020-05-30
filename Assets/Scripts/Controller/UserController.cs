@@ -13,7 +13,7 @@ public class UserController : MonoBehaviour
     [SerializeField] bool isControllable = false; // Serialized for debugging
 
     // Cache
-    [SerializeField] Entity entity; // entity to control
+    Entity entity; // entity to control
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
