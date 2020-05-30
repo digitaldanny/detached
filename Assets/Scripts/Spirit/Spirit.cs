@@ -146,4 +146,16 @@ public class Spirit : MonoBehaviour
 
         Destroy(gameObject, 0f);
     }
+
+    /*
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: GetPlayerReference
+     * Gets reference to player that launched the spirit out to control
+     * the enemy.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public Entity GetPlayerReference()
+    {
+        return GetComponentInParent<Entity>();
+    }
 }

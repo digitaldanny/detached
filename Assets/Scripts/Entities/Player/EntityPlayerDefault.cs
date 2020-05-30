@@ -63,8 +63,6 @@ public class EntityPlayerDefault : Entity
     */
     public override void HandleRanged(Vector2 cursorPos)
     {
-        if (isFrozen) { return; } // only allow the player to shoot one spirit
-
         // Do not allow the player to move after launching the spirit
         FreezePlayer();
 
@@ -97,8 +95,6 @@ public class EntityPlayerDefault : Entity
     */
     public override void HandleSpecial(Vector2 cursorPos)
     {
-        if (isFrozen) { return; }
-
         // check if teleport point is still valid
         if (this.prevTeleportPoint.valid)
         {

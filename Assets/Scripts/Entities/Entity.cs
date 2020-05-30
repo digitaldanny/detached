@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
@@ -54,8 +55,6 @@ public class Entity : MonoBehaviour
      *  Is the player alive?
      * @isGrounded
      *  Is the player touching the ground?
-     * @isFrozen
-     *  Is the player able to move?
      * @currentNumberJumps
      *  How many times has the player jumped since leaving the ground?
      * @maxNumberJumps
@@ -87,7 +86,6 @@ public class Entity : MonoBehaviour
     // State
     protected bool isAlive;
     protected bool isGrounded;
-    protected bool isFrozen;
     protected int currentNumberJumps;
     protected int maxNumberJumps;
     protected float allowedJumpTime;
@@ -111,7 +109,6 @@ public class Entity : MonoBehaviour
         currentNumberJumps = 0;
         isAlive = true;
         isGrounded = true;
-        isFrozen = false;
         maxNumberJumps = jumpSpeed.Length;
         allowedJumpTime = 0;
         prevTeleportPoint = new TeleportPoint();
@@ -184,7 +181,7 @@ public class Entity : MonoBehaviour
     */
     protected void FreezePlayer()
     {
-        this.isFrozen = true;
+        SetControl(false);
         myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
@@ -213,8 +210,6 @@ public class Entity : MonoBehaviour
      */
     public virtual void HandleRun(float controlThrow)
     {
-        if (isFrozen) { return; }
-
         // Calculate new velocity using acceleration with a max run speed
         float xVelocity = myRigidbody.velocity.x + controlThrow * this.runAcceleration;
         float xVelocityClamped = Mathf.Clamp(xVelocity, -1f * this.maxRunSpeed, this.maxRunSpeed);
@@ -246,8 +241,6 @@ public class Entity : MonoBehaviour
     */
     public virtual void HandleJump()
     {
-        if (isFrozen) { return; }
-
         // Check if the player has met the delay requirement between jumps.
         // If he has, update the allowed jump time again for future jumps.
         // If he has not, return and wait for allowed jump time.
@@ -315,12 +308,12 @@ public class Entity : MonoBehaviour
         myRigidbody.velocity = velocity;
 
         // enable player movement again
-        this.isFrozen = false;
+        SetControl(true);
     }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: RequestControl
+     * SUMMARY: SetControl
      * After calling this function, the UserController will be enabled
      * and the player will be able to control this game object.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+

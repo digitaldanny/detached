@@ -12,6 +12,7 @@ public class EntityEnemyNormal : Entity
     // Configs
 
     // State
+    Entity player; // if the player controls the enemy, reference the player here.
 
     // Cache
 
@@ -26,21 +27,48 @@ public class EntityEnemyNormal : Entity
         // If enemy collided with spirit, give it control
         if (collision.gameObject.GetComponent<Spirit>() != null)
         {
-            GiveUserControl(collision.gameObject.GetComponent<Spirit>());
+            GiveUserControlOfEnemy(collision.gameObject.GetComponent<Spirit>());
         }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleRange (Spirit Return)
+     * Launches spirit back to the player that originally launched the
+     * spirit.
+     * 
+     * NOTE: This function will only be called when user controls the enemy.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public override void HandleRanged(Vector2 cursorPos)
+    {
+        GiveUserControlOfPlayer();
     }
 
     // **********************************************************************
     //                       PRIVATE METHODS / COROUTINES
     // **********************************************************************
-    private void GiveUserControl(Spirit spirit)
-    {
-        Debug.Log("Enemy gave user control!");
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: GiveUserControlOfEnemy, GiveUserControlOfPlayer
+     * These functions enable the UserController for either the player
+     * or the enemy (this object).
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void GiveUserControlOfEnemy(Spirit spirit)
+    {
         // Destroy the spirit game object and play sounds/animation
+        player = spirit.GetPlayerReference();
         spirit.TakeControl();
 
         // Allow user input to control enemy
         myController.SetControllable(true);
+    }
+
+    private void GiveUserControlOfPlayer()
+    {
+        myController.SetControllable(false);
+        player.SetControl(true);
     }
 }
