@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 8874793710004259981}
   - component: {fileID: -4821783338817125939}
   - component: {fileID: -4452010002733407157}
-  - component: {fileID: 6166933790860936097}
   - component: {fileID: 1027635585}
   m_Layer: 10
   m_Name: Player
@@ -143,20 +142,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0.015962899, y: -0.03192568}
   m_Size: {x: 0.51587725, y: 0.81114864}
   m_Direction: 0
---- !u!114 &6166933790860936097
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8874793710004259984}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f431b08392881840bcc29aa5d797993, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isControllable: 0
-  entity: {fileID: 0}
 --- !u!114 &1027635585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +161,7 @@ MonoBehaviour:
   - 30
   fallSpeed: 240
   secondsBetweenDoubleJump: 0.1
+  spriteFacingRight: 1
   spirit: {fileID: 4022419655058528293, guid: da86196f508cb614cbb98e7d92272137, type: 3}
   launchPower: 30
   verticalLaunchOffset: 0.5

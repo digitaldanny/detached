@@ -49,7 +49,8 @@ public class EntityPlayerDefault : Entity
         base.StartE();
 
         // Players should start the game being able to control the player.
-        myController.SetControllable(true);
+        SetEntityToControl(this);
+        SetControllable(true);
     }
 
     /* 

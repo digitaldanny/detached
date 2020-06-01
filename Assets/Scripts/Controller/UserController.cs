@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class UserController : MonoBehaviour
@@ -10,19 +11,14 @@ public class UserController : MonoBehaviour
     // Configs
 
     // State
-    [SerializeField] bool isControllable = false; // Serialized for debugging
+    [SerializeField] bool isControllable = true; // Serialized for debugging
+    [SerializeField] Entity entity;
 
     // Cache
-    Entity entity; // entity to control
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
-
-    private void Start()
-    {
-        entity = GetComponent<Entity>(); // get the first component derived from Entity
-    }
 
     private void Update()
     {
@@ -53,7 +49,10 @@ public class UserController : MonoBehaviour
     {
         // left to right = -1 to +1
         float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_HORIZONTAL);
-        entity.HandleRun(controlThrow);
+        if (entity)
+        {
+            entity.HandleRun(controlThrow);
+        }
     }
 
     private void HandleJump()
@@ -61,7 +60,10 @@ public class UserController : MonoBehaviour
         // Check if player has pressed the jump button
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_JUMP))
         {
-            entity.HandleJump();
+            if (entity)
+            {
+                entity.HandleJump();
+            }
         }
     }
 
@@ -72,7 +74,10 @@ public class UserController : MonoBehaviour
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE1))
         {
             Vector2 cursorPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
-            entity.HandleRanged(cursorPos);
+            if (entity)
+            {
+                entity.HandleRanged(cursorPos);
+            }
         }
     }
 
@@ -83,7 +88,10 @@ public class UserController : MonoBehaviour
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
         {
             Vector2 cursorPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
-            entity.HandleSpecial(cursorPos);
+            if (entity)
+            {
+                entity.HandleSpecial(cursorPos);
+            }
         }
     }
 
@@ -102,4 +110,16 @@ public class UserController : MonoBehaviour
         this.isControllable = enabled;
         return true;
     }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetEntity
+     * Sets the entity that will be controlled.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public bool SetEntity(Entity entity)
+    {
+        this.entity = entity;
+        return true;
+    }    
 }

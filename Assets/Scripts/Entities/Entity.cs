@@ -95,7 +95,6 @@ public class Entity : MonoBehaviour
     protected Rigidbody2D myRigidbody;
     protected Animator myAnimator;
     protected Collider2D myCollider2D;
-    protected UserController myController;
     protected SpriteRenderer mySpriteRenderer;
 
     // **********************************************************************
@@ -117,7 +116,6 @@ public class Entity : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody2D>();
         myAnimator = GetComponent<Animator>();
         myCollider2D = GetComponent<Collider2D>();
-        myController = GetComponent<UserController>();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -181,7 +179,7 @@ public class Entity : MonoBehaviour
     */
     protected void FreezePlayer()
     {
-        SetControl(false);
+        SetControllable(false);
         myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
@@ -197,6 +195,31 @@ public class Entity : MonoBehaviour
         // Add upward force to player so it jumps.
         Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
         myRigidbody.velocity += jumpVelocityToAdd;
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetControllable
+     * If a controller game object exists, it will enable or disable
+     * its controls.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void SetControllable(bool enabled)
+    {
+        UserController controller = FindObjectOfType<UserController>();
+        if (controller) { controller.SetControllable(enabled); }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetEntityToControl
+     * If a controller game object exists, set the entity to control.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void SetEntityToControl(Entity entity)
+    {
+        UserController controller = FindObjectOfType<UserController>();
+        if (controller) { controller.SetEntity(entity); }
     }
 
     // **********************************************************************
@@ -308,18 +331,6 @@ public class Entity : MonoBehaviour
         myRigidbody.velocity = velocity;
 
         // enable player movement again
-        SetControl(true);
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetControl
-     * After calling this function, the UserController will be enabled
-     * and the player will be able to control this game object.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    public virtual void SetControl(bool enabled)
-    {
-        myController.SetControllable(enabled);
+        SetControllable(true);
     }
 }

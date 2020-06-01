@@ -62,13 +62,15 @@ public class EntityEnemyNormal : Entity
         player = spirit.GetPlayerReference();
         spirit.TakeControl();
 
-        // Allow user input to control enemy
-        myController.SetControllable(true);
+        // Set the enemy as the entity to control
+        SetEntityToControl(this);
+        SetControllable(true);
     }
 
     private void GiveUserControlOfPlayer()
     {
-        myController.SetControllable(false);
-        player.SetControl(true);
+        // Set player as the entity to control
+        SetEntityToControl(player);
+        SetControllable(true);
     }
 }

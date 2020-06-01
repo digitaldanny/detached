@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 594697677798442943}
   - component: {fileID: 5655613079181413119}
   - component: {fileID: 3557311289948057465}
-  - component: {fileID: 2809131413949859987}
   - component: {fileID: 93556373344122766}
   m_Layer: 11
   m_Name: Enemy
@@ -143,19 +142,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0.20332211, y: 0.011310101}
   m_Size: {x: 0.6600002, y: 2.2811956}
   m_Direction: 0
---- !u!114 &2809131413949859987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 594697677798442914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f431b08392881840bcc29aa5d797993, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isControllable: 0
 --- !u!114 &93556373344122766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,5 +159,6 @@ MonoBehaviour:
   jumpSpeed:
   - 30
   - 30
-  fallSpeed: 240
+  fallSpeed: 300
   secondsBetweenDoubleJump: 0.1
+  spriteFacingRight: 0
