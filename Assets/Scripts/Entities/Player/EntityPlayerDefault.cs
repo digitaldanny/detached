@@ -48,6 +48,9 @@ public class EntityPlayerDefault : Entity
     {
         base.StartE();
 
+        // Start the game with the cameras pointed at the player
+        SetEntityForPlayerCameraToFollow(transform);
+
         // Players should start the game being able to control the player.
         SetEntityToControl(this);
         SetControllable(true);

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Brain Blends
   m_EditorClassIdentifier: 
   m_CustomBlends:
-  - m_From: Player Cameras
-    m_To: Spirit Cameras
+  - m_From: Player Camera
+    m_To: Spirit Camera
     m_Blend:
       m_Style: 1
       m_Time: 0.25
@@ -24,11 +24,11 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-  - m_From: Spirit Cameras
-    m_To: Player Cameras
+  - m_From: Spirit Camera
+    m_To: Player Camera
     m_Blend:
       m_Style: 1
-      m_Time: 1
+      m_Time: 1.5
       m_CustomCurve:
         serializedVersion: 2
         m_Curve: []

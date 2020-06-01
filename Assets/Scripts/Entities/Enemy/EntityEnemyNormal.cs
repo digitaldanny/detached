@@ -12,7 +12,7 @@ public class EntityEnemyNormal : Entity
     // Configs
 
     // State
-    Entity player; // if the player controls the enemy, reference the player here.
+    Transform player; // if the player controls the enemy, reference the player here.
 
     // Cache
 
@@ -58,6 +58,9 @@ public class EntityEnemyNormal : Entity
     */
     private void GiveUserControlOfEnemy(Spirit spirit)
     {
+        // Set enemy as entity for player cameras to follow
+        SetEntityForPlayerCameraToFollow(transform);
+
         // Destroy the spirit game object and play sounds/animation
         player = spirit.GetPlayerReference();
         spirit.TakeControl();
@@ -69,8 +72,11 @@ public class EntityEnemyNormal : Entity
 
     private void GiveUserControlOfPlayer()
     {
+        // Set player as entity for camera to follow
+        SetEntityForPlayerCameraToFollow(player);
+
         // Set player as the entity to control
-        SetEntityToControl(player);
+        SetEntityToControl(player.GetComponent<Entity>());
         SetControllable(true);
     }
 }

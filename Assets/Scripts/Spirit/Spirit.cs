@@ -144,6 +144,9 @@ public class Spirit : MonoBehaviour
 
         // play sound
 
+        // Give player camera control
+        cameraManager.SetPlayerCamera(true);
+
         Destroy(gameObject, 0f);
     }
 
@@ -154,8 +157,8 @@ public class Spirit : MonoBehaviour
      * the enemy.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public Entity GetPlayerReference()
+    public Transform GetPlayerReference()
     {
-        return GetComponentInParent<Entity>();
+        return transform.parent;
     }
 }

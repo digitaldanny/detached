@@ -78,6 +78,10 @@ public class CameraManager : MonoBehaviour
         DebugCameraSwitcherTool();
     }
 
+    // **********************************************************************
+    //                      PRIVATE METHODS / COROUTINES
+    // **********************************************************************
+
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: Set{CameraSystem}
@@ -85,7 +89,7 @@ public class CameraManager : MonoBehaviour
      * be in use by setting priority to max.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void SetCameraSystem(CameraLabel selectedSystem, bool setting)
+    private void SetCameraSystem(CameraLabel selectedSystem, bool setting)
     {
         switch (selectedSystem)
         {
@@ -94,9 +98,9 @@ public class CameraManager : MonoBehaviour
                 // If enabling, set player cam to max priority
                 // Else, return player cam to default settings
                 if (enabled == true)
-                    playerCamSystem.cam.GetComponent<CinemachineStateDrivenCamera>().Priority = maxCameraPriority;
+                    playerCamSystem.cam.GetComponent<CinemachineVirtualCamera>().Priority = maxCameraPriority;
                 else
-                    playerCamSystem.cam.GetComponent<CinemachineStateDrivenCamera>().Priority = playerCamSystem.defaultPriority;
+                    playerCamSystem.cam.GetComponent<CinemachineVirtualCamera>().Priority = playerCamSystem.defaultPriority;
                 break;
 
 
@@ -117,6 +121,10 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    // **********************************************************************
+    //                      PUBLIC METHODS / COROUTINES
+    // **********************************************************************
+
     public void SetSpiritCamera(bool setting)
     {
         SetCameraSystem(CameraLabel.CAM_SPIRIT, true);
@@ -128,10 +136,6 @@ public class CameraManager : MonoBehaviour
         SetCameraSystem(CameraLabel.CAM_PLAYER, true);
         SetCameraSystem(CameraLabel.CAM_SPIRIT, false);
     }
-
-    // **********************************************************************
-    //                         METHODS / COROUTINES
-    // **********************************************************************
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -146,6 +150,18 @@ public class CameraManager : MonoBehaviour
     {
         CinemachineVirtualCamera vcam = spiritCamSystem.cam.GetComponent<CinemachineVirtualCamera>();
         vcam.Follow = spirit;
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetEntityForCameraToFollow
+     * Sets the entity for the Player Cameras to follow.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public void SetEntityForPlayerCameraToFollow(Transform player)
+    {
+        CinemachineVirtualCamera vcam = playerCamSystem.cam.GetComponent<CinemachineVirtualCamera>();
+        vcam.Follow = player;
     }
 
     // **********************************************************************

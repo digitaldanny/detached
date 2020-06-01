@@ -222,6 +222,18 @@ public class Entity : MonoBehaviour
         if (controller) { controller.SetEntity(entity); }
     }
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetEntityForPlayerCameraToFollow
+     * Set entity to follow using the player cameras.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void SetEntityForPlayerCameraToFollow(Transform entityTransform)
+    {
+        CameraManager cameraManager = FindObjectOfType<CameraManager>();
+        if (cameraManager) { cameraManager.SetEntityForPlayerCameraToFollow(entityTransform); }
+    }
+
     // **********************************************************************
     //                      PUBLIC METHODS / COROUTINES
     // **********************************************************************
