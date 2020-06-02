@@ -9,12 +9,17 @@ public class UserController : MonoBehaviour
     // **********************************************************************
 
     // Configs
+    [Header("CURSOR")]
+    [SerializeField] bool cusorEnabled = true;
+    [SerializeField] GameObject cursor; // cursor prefab
 
     // State
-    [SerializeField] bool isControllable = true; // Serialized for debugging
+    bool isControllable = true; // Serialized for debugging
     [SerializeField] Entity entity;
 
     // Cache
+    GameObject cursorObj; // instantiated cursor game object
+    Cursor cursorComponent; // cursor component of the game object
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
@@ -30,6 +35,8 @@ public class UserController : MonoBehaviour
             HandleRanged(); // check if ranged attack was used
             HandleSpecial(); // check if special ability was used
         }
+
+        UpdateCursor(); // update position of cursor based on mouse position.
     }
 
     // **********************************************************************
@@ -92,6 +99,45 @@ public class UserController : MonoBehaviour
             {
                 entity.HandleSpecial(cursorPos);
             }
+        }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: UpdateCursor
+     * Update the position of the cursor based on position of the mouse
+     * AND position of the selected entity.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void UpdateCursor()
+    {
+        if (this.cusorEnabled)
+        {
+            if (!cursorObj)
+            {
+                // if the cursor hasn't been instantiated, instantiate as child here.
+                cursorObj = Instantiate(
+                    cursor,
+                    entity.transform.position,
+                    Quaternion.identity,
+                    transform
+                ) as GameObject;
+
+                cursorComponent = cursorObj.GetComponent<Cursor>();
+            }
+
+            // update the cursor position based on player's center point and the 
+            // mouse position.
+            cursorComponent.UpdatePosition(
+                entity.GetPosition(),
+                Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition)
+            );
+        }
+
+        // Destroy cursor if it is not enabled
+        else if (cursorObj)
+        {
+            Destroy(cursorObj);
         }
     }
 

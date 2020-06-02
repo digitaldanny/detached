@@ -1,6 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class Entity : MonoBehaviour
 {
     // **********************************************************************
@@ -344,5 +347,16 @@ public class Entity : MonoBehaviour
 
         // enable player movement again
         SetControllable(true);
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: GetPosition
+     * Returns entity's position in the world.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public Vector2 GetPosition()
+    {
+        return transform.position;
     }
 }
