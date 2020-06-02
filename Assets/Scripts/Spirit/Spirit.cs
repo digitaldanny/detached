@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor.U2D.Path.GUIFramework;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
@@ -13,6 +14,8 @@ public class Spirit : Entity
     // **********************************************************************
 
     // Configs
+    [Header("SPIRIT")]
+    [SerializeField] float verticalEase = 1f;
 
     // State
 
@@ -106,6 +109,20 @@ public class Spirit : Entity
     // **********************************************************************
     //                    ENTITY OVERRIDE METHODS / COROUTINES
     // **********************************************************************
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleVertical
+     * Ease spirit towards direction that player towards vertical direction.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public override void HandleVertical(float controlThrow)
+    {
+        if (!isGrounded)
+        {
+            myRigidbody.velocity += new Vector2(0f, verticalEase * controlThrow);
+        }
+    }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+

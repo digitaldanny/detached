@@ -12,6 +12,7 @@ public class UserController : MonoBehaviour
     [Header("CURSOR")]
     [SerializeField] bool cursorEnabled = true;
     [SerializeField] GameObject cursor; // cursor prefab
+    [SerializeField] Vector2 defaultCursorDir;
 
     // State
     string controllerType; // is game being controlled by keyboard/mouse or xbox 360?
@@ -30,7 +31,7 @@ public class UserController : MonoBehaviour
     private void Start()
     {
         controllerType = GlobalConfigs.CONTROLLER_TYPE_XBOX360;
-        cursorDir = new Vector2(0f, 0f);
+        cursorDir = defaultCursorDir;
     }
 
     private void Update()
@@ -42,6 +43,7 @@ public class UserController : MonoBehaviour
         if (this.isControllable)
         {
             HandleRun(); // check if player is running or if sprite should be flipped
+            HandleVertical(); // check if player is using left joystick's Y axis
             HandleJump(); // check if player jumped
             HandleRanged(); // check if ranged attack was used
             HandleSpecial(); // check if special ability was used
@@ -69,6 +71,16 @@ public class UserController : MonoBehaviour
         if (entity)
         {
             entity.HandleRun(controlThrow);
+        }
+    }
+
+    private void HandleVertical()
+    {
+        // left to right = -1 to +1
+        float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_LEFT_JOYSTICK_Y);
+        if (entity)
+        {
+            entity.HandleVertical(controlThrow);
         }
     }
 
@@ -183,8 +195,11 @@ public class UserController : MonoBehaviour
                 }
                 else
                 {
-                    this.cursorDir.x = joystickRightX;
-                    this.cursorDir.y = joystickRightY;
+                    // Joystick may not be at max value based on player input, so calculate
+                    // the angle and produce the max vector based on the angle.
+                    float theta = Mathf.Atan2(joystickRightY, joystickRightX);
+                    this.cursorDir.x = Mathf.Cos(theta);
+                    this.cursorDir.y = Mathf.Sin(theta);
                 }
                 break;
 

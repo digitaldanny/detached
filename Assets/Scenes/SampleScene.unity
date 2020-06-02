@@ -266,6 +266,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1027635585, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
+      propertyPath: launchPower
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -694,6 +698,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cursorEnabled: 1
   cursor: {fileID: 2274403731687234004, guid: 5d27e7ca87c360b46a9f7145e919dab5, type: 3}
+  defaultCursorDir: {x: 1, y: 0}
 --- !u!1 &1123501670
 GameObject:
   m_ObjectHideFlags: 0

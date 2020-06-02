@@ -5,9 +5,11 @@
 [RequireComponent(typeof(SpriteRenderer))]
 public class Entity : MonoBehaviour
 {
+
     // **********************************************************************
     //                          CLASS STRUCTURES
     // **********************************************************************
+
 
     /*
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -71,9 +73,11 @@ public class Entity : MonoBehaviour
         }
     }
 
+
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
+
 
     /*
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -133,9 +137,11 @@ public class Entity : MonoBehaviour
     protected Collider2D myCollider2D;
     protected SpriteRenderer mySpriteRenderer;
 
+
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
+
 
     void Start() { StartE(); }
     protected void StartE()
@@ -184,8 +190,9 @@ public class Entity : MonoBehaviour
         }
     }
 
+
     // **********************************************************************
-    //                    PROTECTED METHODS / COROUTINES
+    //                 PUBLIC + VIRTUAL METHODS / COROUTINES
     // **********************************************************************
 
 
@@ -219,25 +226,8 @@ public class Entity : MonoBehaviour
     }
 
     /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: Jump
-     * This function adds upward force to the rigidbody when called.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected void Jump(float jumpPowerCustom)
-    {
-        // Add upward force to player so it jumps.
-        Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
-        myRigidbody.velocity += jumpVelocityToAdd;
-    }
-
-    // **********************************************************************
-    //                      PUBLIC METHODS / COROUTINES
-    // **********************************************************************
-
-    /* 
       * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-      * SUMMARY: HandleRun
+      * SUMMARY: HandleRun - left joystick horizontal axis
       * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      */
     public virtual void HandleRun(float controlThrow)
@@ -294,28 +284,6 @@ public class Entity : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleRanged
-     * Ranged attack varies from character to character.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    public virtual void HandleRanged(Vector2 cursorDir)
-    {
-        Debug.Log("ERROR (Entity.HandleRanged): Method not implemented for base class.");
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleSpecial
-     * Special ability varies from character to character.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    public virtual void HandleSpecial(Vector2 cursorDir)
-    {
-        Debug.Log("ERROR (Entity.HandleSpecial): Method not implemented for base class.");
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: UpdateTeleportPoint
      * 1. Teleports the player to the specified location.
      * 2. Updates the previousTeleportLocation with valid and new location.
@@ -344,9 +312,51 @@ public class Entity : MonoBehaviour
      * Returns entity's position in the world.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public Vector2 GetPosition()
+    public virtual Vector2 GetPosition()
     {
         return transform.position;
+    }
+
+    /* 
+      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+      * SUMMARY: HandleVertical - left joystick vertical axis
+      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     */
+    public virtual void HandleVertical(float controlThrow) { return; }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleRanged
+     * Ranged attack varies from character to character.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public virtual void HandleRanged(Vector2 cursorDir) { return; }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleSpecial
+     * Special ability varies from character to character.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public virtual void HandleSpecial(Vector2 cursorDir) { return; }
+
+
+    // **********************************************************************
+    //                        PROTECTED METHODS
+    // **********************************************************************
+
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: Jump
+     * This function adds upward force to the rigidbody when called.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void Jump(float jumpPowerCustom)
+    {
+        // Add upward force to player so it jumps.
+        Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
+        myRigidbody.velocity += jumpVelocityToAdd;
     }
 
     // **********************************************************************
