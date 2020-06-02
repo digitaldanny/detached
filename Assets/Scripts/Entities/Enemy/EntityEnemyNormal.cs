@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class EntityEnemyNormal : Entity
 {
     // **********************************************************************
@@ -15,10 +16,19 @@ public class EntityEnemyNormal : Entity
     Transform player; // if the player controls the enemy, reference the player here.
 
     // Cache
+    protected Animator myAnimator;
 
     // **********************************************************************
     //                      ENTITY CLASS OVERLOAD METHODS
     // **********************************************************************
+
+    private void Start()
+    {
+        base.StartE();
+
+        // Cache
+        myAnimator = GetComponent<Animator>();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -63,11 +73,10 @@ public class EntityEnemyNormal : Entity
 
         // Destroy the spirit game object and play sounds/animation
         player = spirit.GetPlayerReference();
-        spirit.TakeControl();
+        spirit.GiveUpControlToEntity(this);
 
         // Set the enemy as the entity to control
-        SetEntityToControl(this);
-        SetControllable(true);
+        SetControllerConfigs(new ControllerConfigs(true, this, true));
     }
 
     private void GiveUserControlOfPlayer()
@@ -76,7 +85,6 @@ public class EntityEnemyNormal : Entity
         SetEntityForPlayerCameraToFollow(player);
 
         // Set player as the entity to control
-        SetEntityToControl(player.GetComponent<Entity>());
-        SetControllable(true);
+        SetControllerConfigs(new ControllerConfigs(true, player.GetComponent<Entity>(), true));
     }
 }

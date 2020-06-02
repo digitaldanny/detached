@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class EntityPlayerDefault : Entity
 {
     // **********************************************************************
@@ -32,6 +34,7 @@ public class EntityPlayerDefault : Entity
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
 
+    // Configs
     [Header("SPIRIT")]
     [SerializeField] protected GameObject spirit;
     [SerializeField] protected float launchPower = 30f;
@@ -39,6 +42,11 @@ public class EntityPlayerDefault : Entity
     [SerializeField] protected float maxTimeInSpiritForm = 5f;
     [SerializeField] protected float spiritRechargeDelay = 2f;
     [SerializeField] protected float spiritRechargeAmount = 0.5f;
+
+    // State
+
+    // Cache
+    protected Animator myAnimator;
 
     // **********************************************************************
     //                       ENTITY OVERLOAD METHODS
@@ -48,12 +56,14 @@ public class EntityPlayerDefault : Entity
     {
         base.StartE();
 
+        // Cache
+        myAnimator = GetComponent<Animator>();
+
         // Start the game with the cameras pointed at the player
         SetEntityForPlayerCameraToFollow(transform);
 
         // Players should start the game being able to control the player.
-        SetEntityToControl(this);
-        SetControllable(true);
+        SetControllerConfigs(new ControllerConfigs(true, this, true));
     }
 
     /* 
@@ -65,7 +75,7 @@ public class EntityPlayerDefault : Entity
      * character again.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleRanged(Vector2 cursorPos)
+    public override void HandleRanged(Vector2 cursorDir)
     {
         // Do not allow the player to move after launching the spirit
         FreezePlayer();
@@ -79,14 +89,10 @@ public class EntityPlayerDefault : Entity
             transform
         ) as GameObject;
 
-        // Get the target vector
-        Vector2 myPos = transform.position;
-        Vector2 direction = (cursorPos - myPos);
-        direction.Normalize();
-
-        // Launch the spirit towards where the cursor was aiming.
         Rigidbody2D spiritRigidBody = spiritLaunched.gameObject.GetComponent<Rigidbody2D>();
-        spiritRigidBody.velocity += direction * launchPower;
+
+        // Launch the spirit towards where the joystick was aiming
+        spiritRigidBody.velocity += cursorDir * launchPower;
     }
 
     /* 
@@ -97,7 +103,7 @@ public class EntityPlayerDefault : Entity
      * 2. Set player camera.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleSpecial(Vector2 cursorPos)
+    public override void HandleSpecial(Vector2 cursorDir)
     {
         // check if teleport point is still valid
         if (this.prevTeleportPoint.valid)
@@ -105,5 +111,20 @@ public class EntityPlayerDefault : Entity
             this.prevTeleportPoint.valid = false; // make sure players can't teleport to same location twice
             transform.position = this.prevTeleportPoint.location; // teleport
         }
+    }
+
+    public override void HandleRun(float controlThrow)
+    {
+        base.HandleRun(controlThrow);
+
+        // Tell animator when to play run animator
+        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= Mathf.Epsilon;
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed); 
+    }
+
+    protected override void FreezePlayer() 
+    {
+        base.FreezePlayer();
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
 }

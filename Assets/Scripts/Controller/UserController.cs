@@ -10,12 +10,14 @@ public class UserController : MonoBehaviour
 
     // Configs
     [Header("CURSOR")]
-    [SerializeField] bool cusorEnabled = true;
+    [SerializeField] bool cursorEnabled = true;
     [SerializeField] GameObject cursor; // cursor prefab
 
     // State
-    bool isControllable = true; // Serialized for debugging
-    [SerializeField] Entity entity;
+    string controllerType; // is game being controlled by keyboard/mouse or xbox 360?
+    Vector2 cursorDir; // direction that right joystick OR mouse is pointing at
+    bool isControllable;
+    Entity entity;
 
     // Cache
     GameObject cursorObj; // instantiated cursor game object
@@ -25,8 +27,17 @@ public class UserController : MonoBehaviour
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
 
+    private void Start()
+    {
+        controllerType = GlobalConfigs.CONTROLLER_TYPE_XBOX360;
+        cursorDir = new Vector2(0f, 0f);
+    }
+
     private void Update()
     {
+        UpdateCursorDir(); // update cursorDir state variable based on joystick OR mouse.
+        UpdateCursorSprite(); // update joystick+mouse position AND position of cursor if enabled. 
+
         // Player movement that can only happen when the player is not frozen.
         if (this.isControllable)
         {
@@ -34,9 +45,8 @@ public class UserController : MonoBehaviour
             HandleJump(); // check if player jumped
             HandleRanged(); // check if ranged attack was used
             HandleSpecial(); // check if special ability was used
+            HandlePunch(); // check if punch was used
         }
-
-        UpdateCursor(); // update position of cursor based on mouse position.
     }
 
     // **********************************************************************
@@ -55,7 +65,7 @@ public class UserController : MonoBehaviour
     private void HandleRun()
     {
         // left to right = -1 to +1
-        float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_HORIZONTAL);
+        float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_LEFT_JOYSTICK_X);
         if (entity)
         {
             entity.HandleRun(controlThrow);
@@ -74,44 +84,50 @@ public class UserController : MonoBehaviour
         }
     }
 
-    // Fire1 reaction (left mouse click)
     private void HandleRanged()
     {
         // Check if the player clicked the fire button
-        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE1))
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_RANGED))
         {
-            Vector2 cursorPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
             if (entity)
             {
-                entity.HandleRanged(cursorPos);
+                entity.HandleRanged(this.cursorDir);
             }
         }
     }
 
-    // Fire2 reaction (right mouse click)
     private void HandleSpecial()
     {
         // Check if player presses teleport button
-        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_SPECIAL))
         {
-            Vector2 cursorPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
             if (entity)
             {
-                entity.HandleSpecial(cursorPos);
+                entity.HandleSpecial(this.cursorDir);
             }
+        }
+    }
+
+    private void HandlePunch()
+    {
+        // Check if player presses teleport button
+        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_PUNCH))
+        {
+            Debug.Log("ERROR (UserController.HandlePunch): Punch not implemented for controller.");
         }
     }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: UpdateCursor
-     * Update the position of the cursor based on position of the mouse
+     * SUMMARY: UpdateCursorSprite
+     * Update the position of the cursor based on position of the mouse/joystick
      * AND position of the selected entity.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void UpdateCursor()
+    private void UpdateCursorSprite()
     {
-        if (this.cusorEnabled)
+        // Update cursor sprite position if enabled.
+        if (this.cursorEnabled)
         {
             if (!cursorObj)
             {
@@ -127,10 +143,10 @@ public class UserController : MonoBehaviour
             }
 
             // update the cursor position based on player's center point and the 
-            // mouse position.
+            // mouse+joystick position.
             cursorComponent.UpdatePosition(
                 entity.GetPosition(),
-                Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition)
+                this.cursorDir
             );
         }
 
@@ -141,14 +157,68 @@ public class UserController : MonoBehaviour
         }
     }
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: UpdateCursorDir
+     * Update cursorDir state variable based on whether the mouse or
+     * right joystick is being used.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    private void UpdateCursorDir()
+    {
+        switch(controllerType)
+        {
+            case GlobalConfigs.CONTROLLER_TYPE_XBOX360:
+
+                // Capture joystick values
+                float joystickRightX = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_RIGHT_JOYSTICK_X);
+                float joystickRightY = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_RIGHT_JOYSTICK_Y);
+
+                // if being controlled by the joysticks, don't change the angle if
+                // the joystick has recentered.
+                if (Mathf.Abs(joystickRightX) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD &&
+                    Mathf.Abs(joystickRightY) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD)
+                {
+                    break;
+                }
+                else
+                {
+                    this.cursorDir.x = joystickRightX;
+                    this.cursorDir.y = joystickRightY;
+                }
+                break;
+
+            case GlobalConfigs.CONTROLLER_TYPE_KEYBOARD:
+
+                // Capture mouse position
+                Vector2 cursorPos = Camera.main.ScreenToWorldPoint(CrossPlatformInputManager.mousePosition);
+
+                // Calculate angle that cursor should be moved to if using the mouse
+                // to aim.
+                Vector2 entityPos = entity.GetPosition();
+                float deltaX = cursorPos.x - entityPos.x;
+                float deltaY = cursorPos.y - entityPos.y;
+                float thetaRadians = Mathf.Atan2(deltaY, deltaX);
+
+                // Calculate the new cursor position if using mouse.
+                this.cursorDir.x = Mathf.Cos(thetaRadians);
+                this.cursorDir.y = Mathf.Sin(thetaRadians);
+                break;
+
+            default:
+                Debug.Log("ERROR (UserController.UpdateCursorDir): Unknown controller type.");
+                break;
+        }    
+    }
+
     // **********************************************************************
     //                          PUBLIC METHODS
     // **********************************************************************
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetControllable
-     * Allows user to control Entity game object if set true.
+     * SUMMARY: Set{Property}
+     * Setter function for various controller attributes.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     public bool SetControllable(bool enabled)
@@ -156,16 +226,15 @@ public class UserController : MonoBehaviour
         this.isControllable = enabled;
         return true;
     }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetEntity
-     * Sets the entity that will be controlled.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
     public bool SetEntity(Entity entity)
     {
         this.entity = entity;
         return true;
     }    
+
+    public bool SetCursorEnable(bool enabled)
+    {
+        this.cursorEnabled = enabled;
+        return true;
+    }
 }

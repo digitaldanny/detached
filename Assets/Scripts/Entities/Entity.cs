@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class Entity : MonoBehaviour
@@ -34,6 +33,41 @@ public class Entity : MonoBehaviour
             valid = false;
             location = new Vector2(0f, 0f);
             velocity = new Vector2(0f, 0f);
+        }
+    }
+
+    /*
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: ControllerConfigs
+     * @controllerEnabled
+     *  
+     * @entityToControl
+     * @cursorEnabled
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected class ControllerConfigs
+    {
+        public bool controllerEnabled;
+        public Entity entityToControl;
+        public bool cursorEnabled;
+
+        // default constructor
+        public ControllerConfigs()
+        {
+            controllerEnabled = false;
+            entityToControl = null;
+            cursorEnabled = false;
+        }
+
+        // parameter constructor
+        public ControllerConfigs(
+            bool controllerEnabled,
+            Entity entityToControl,
+            bool cursorEnabled)
+        {
+            this.controllerEnabled = controllerEnabled;
+            this.entityToControl = entityToControl;
+            this.cursorEnabled = cursorEnabled;
         }
     }
 
@@ -96,7 +130,6 @@ public class Entity : MonoBehaviour
 
     // Cache
     protected Rigidbody2D myRigidbody;
-    protected Animator myAnimator;
     protected Collider2D myCollider2D;
     protected SpriteRenderer mySpriteRenderer;
 
@@ -117,7 +150,6 @@ public class Entity : MonoBehaviour
 
         // Set up cache
         myRigidbody = GetComponent<Rigidbody2D>();
-        myAnimator = GetComponent<Animator>();
         myCollider2D = GetComponent<Collider2D>();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -164,7 +196,7 @@ public class Entity : MonoBehaviour
      * multiplier
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    protected void FallMultiplier()
+    protected virtual void FallMultiplier()
     {
         // only apply falling multiplier if player is already falling
         if (myRigidbody.velocity.y < Mathf.Epsilon)
@@ -180,11 +212,10 @@ public class Entity : MonoBehaviour
      * left or right while frozen.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    protected void FreezePlayer()
+    protected virtual void FreezePlayer()
     {
-        SetControllable(false);
+        SetControllerConfigs(new ControllerConfigs(false, this, true));
         myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
 
     /* 
@@ -198,43 +229,6 @@ public class Entity : MonoBehaviour
         // Add upward force to player so it jumps.
         Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
         myRigidbody.velocity += jumpVelocityToAdd;
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetControllable
-     * If a controller game object exists, it will enable or disable
-     * its controls.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected void SetControllable(bool enabled)
-    {
-        UserController controller = FindObjectOfType<UserController>();
-        if (controller) { controller.SetControllable(enabled); }
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetEntityToControl
-     * If a controller game object exists, set the entity to control.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected void SetEntityToControl(Entity entity)
-    {
-        UserController controller = FindObjectOfType<UserController>();
-        if (controller) { controller.SetEntity(entity); }
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetEntityForPlayerCameraToFollow
-     * Set entity to follow using the player cameras.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected void SetEntityForPlayerCameraToFollow(Transform entityTransform)
-    {
-        CameraManager cameraManager = FindObjectOfType<CameraManager>();
-        if (cameraManager) { cameraManager.SetEntityForPlayerCameraToFollow(entityTransform); }
     }
 
     // **********************************************************************
@@ -255,9 +249,7 @@ public class Entity : MonoBehaviour
 
         myRigidbody.velocity = playerVelocity; // assign new run speed to player
 
-        // Tell animator when to play run animator
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= Mathf.Epsilon;
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed);
 
         // check if player's sprite should be flipped to face direction it is moving
         if (playerHasHorizontalSpeed)
@@ -306,7 +298,7 @@ public class Entity : MonoBehaviour
      * Ranged attack varies from character to character.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public virtual void HandleRanged(Vector2 cursorPos)
+    public virtual void HandleRanged(Vector2 cursorDir)
     {
         Debug.Log("ERROR (Entity.HandleRanged): Method not implemented for base class.");
     }
@@ -317,7 +309,7 @@ public class Entity : MonoBehaviour
      * Special ability varies from character to character.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public virtual void HandleSpecial(Vector2 cursorPos)
+    public virtual void HandleSpecial(Vector2 cursorDir)
     {
         Debug.Log("ERROR (Entity.HandleSpecial): Method not implemented for base class.");
     }
@@ -344,9 +336,6 @@ public class Entity : MonoBehaviour
         // teleport to the requested location and add the requested velocity
         transform.position = location;
         myRigidbody.velocity = velocity;
-
-        // enable player movement again
-        SetControllable(true);
     }
 
     /* 
@@ -358,5 +347,38 @@ public class Entity : MonoBehaviour
     public Vector2 GetPosition()
     {
         return transform.position;
+    }
+
+    // **********************************************************************
+    //                        DEPENDENCY METHODS
+    // **********************************************************************
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetControllerConfigs
+     * Sets various user controller properties.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void SetControllerConfigs(ControllerConfigs configs)
+    {
+        UserController controller = FindObjectOfType<UserController>();
+        if (controller)
+        {
+            controller.SetControllable(configs.controllerEnabled);
+            controller.SetEntity(configs.entityToControl);
+            controller.SetCursorEnable(configs.cursorEnabled);
+        }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetEntityForPlayerCameraToFollow
+     * Set entity to follow using the player cameras.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void SetEntityForPlayerCameraToFollow(Transform entityTransform)
+    {
+        CameraManager cameraManager = FindObjectOfType<CameraManager>();
+        if (cameraManager) { cameraManager.SetEntityForPlayerCameraToFollow(entityTransform); }
     }
 }

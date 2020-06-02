@@ -326,11 +326,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8874793710004259984, guid: 8119e8f0a181103428f0853753ea401b,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
 --- !u!1 &368102712
@@ -697,9 +692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f431b08392881840bcc29aa5d797993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cusorEnabled: 1
+  cursorEnabled: 1
   cursor: {fileID: 2274403731687234004, guid: 5d27e7ca87c360b46a9f7145e919dab5, type: 3}
-  entity: {fileID: 0}
 --- !u!1 &1123501670
 GameObject:
   m_ObjectHideFlags: 0

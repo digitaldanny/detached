@@ -21,14 +21,11 @@ public class Cursor : MonoBehaviour
     // **********************************************************************
     //                          PUBLIC METHODS
     // **********************************************************************
-    public void UpdatePosition(Vector2 playerPos, Vector2 mousePos)
+    public void UpdatePosition(Vector2 playerPos, Vector2 joystick)
     {
-        // Calculate angle that cursor should be moved to.
-        float deltaX = mousePos.x - playerPos.x;
-        float deltaY = mousePos.y - playerPos.y;
-        float thetaRadians = Mathf.Atan2(deltaY, deltaX);
+        // Calculate new cursor angle if using joystick.
+        float thetaRadians = Mathf.Atan2(joystick.y, joystick.x);
 
-        // Calculate the new cursor position.
         Vector2 newPos = new Vector2(radius * Mathf.Cos(thetaRadians), radius * Mathf.Sin(thetaRadians));
 
         // Add configurable offsets from player.

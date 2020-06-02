@@ -2,26 +2,21 @@
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
-[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CapsuleCollider2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(CameraManager))]
-public class Spirit : MonoBehaviour
+public class Spirit : Entity
 {
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
 
     // Configs
-    CameraManager playerCamera;
-    CameraManager SpiritCamera;
 
     // State
-    bool isGrounded;
 
     // Cache
-    Rigidbody2D myRigidbody;
     CapsuleCollider2D myBodyCollider;
     BoxCollider2D myFloorCollider;
     SpriteRenderer spriteRenderer;
@@ -33,11 +28,16 @@ public class Spirit : MonoBehaviour
 
     void Start()
     {
+        base.StartE();
+
+        // Make player controls connect to spirit entity
+        SetControllerConfigs(new ControllerConfigs(true, this, false));
+
         // set up states
         isGrounded = false;
 
         // set up cache
-        myRigidbody = GetComponent<Rigidbody2D>();
+        // myRigidbody = GetComponent<Rigidbody2D>();
         myBodyCollider = GetComponent<CapsuleCollider2D>();
         myFloorCollider = GetComponent<BoxCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -46,11 +46,6 @@ public class Spirit : MonoBehaviour
         // switch to spirit camera
         cameraManager.SetSpiritToFollow(transform);
         cameraManager.SetSpiritCamera(true);
-    }
-
-    private void Update()
-    {
-        HandlePlayerTeleport();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -108,6 +103,10 @@ public class Spirit : MonoBehaviour
         }
     }
 
+    // **********************************************************************
+    //                    ENTITY OVERRIDE METHODS / COROUTINES
+    // **********************************************************************
+
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: HandlePlayerTeleport
@@ -115,21 +114,26 @@ public class Spirit : MonoBehaviour
      * player to the spirit's current location and then destroys itself.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void HandlePlayerTeleport()
+    public override void HandleRanged(Vector2 cursorDir)
     {
-        // Check if player presses teleport button
-        if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_FIRE2))
-        {
-            // Set camera to player before deleting spirit
-            cameraManager.SetPlayerCamera(true);
-
-            // Teleport player to this location
-            GetComponentInParent<Entity>().TeleportHere(transform.position, myRigidbody.velocity);
-
-            // Destroy spirit to show that player recombined with it
-            Destroy(gameObject);
-        }
+        // Teleport player to this location
+        Entity player = GetPlayerReference().GetComponent<Entity>();
+        player.TeleportHere(transform.position, myRigidbody.velocity);
+        this.GiveUpControlToEntity(player);
     }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: Handle{Action}
+     * This actions should not do anything for the Spirit class.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public override void HandleRun(float controlThrow) { return; }
+    public override void HandleJump() { return; }
+    public override void HandleSpecial(Vector2 cursorDir) { return; }
+    protected override void FallMultiplier() { return; }
+    protected override void FreezePlayer() { return; }
+
 
     // **********************************************************************
     //                      PUBLIC METHODS / COROUTINES
@@ -137,13 +141,14 @@ public class Spirit : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: HandleControllingEnemy
+     * 
+     * SUMMARY: GiveUpControl
      * This function is called by the enemy that the spirit collided
      * with so the user can control the enemy.
      * ~ Destroy spirit game object.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public void TakeControl()
+    public void GiveUpControlToEntity(Entity entityGainingControl)
     {
         // play animation
 
@@ -151,6 +156,9 @@ public class Spirit : MonoBehaviour
 
         // Give player camera control
         cameraManager.SetPlayerCamera(true);
+
+        // Give new entity control of the user input
+        SetControllerConfigs(new ControllerConfigs(true, entityGainingControl, true));
 
         Destroy(gameObject, 0f);
     }

@@ -3,11 +3,19 @@
     // **********************************************************************
     // CONTROLLER
     // **********************************************************************
-    public const string CONTROLLER_FIRE1 = "Fire1";
-    public const string CONTROLLER_FIRE2 = "Fire2";
+    public const string CONTROLLER_PUNCH = "Punch";
+    public const string CONTROLLER_SPECIAL = "Special";
     public const string CONTROLLER_JUMP = "Jump";
-    public const string CONTROLLER_HORIZONTAL = "Horizontal";
-    public const string CONTROLLER_VERTICAL = "Vertical";
+    public const string CONTROLLER_RANGED = "Ranged";
+    public const string CONTROLLER_LEFT_JOYSTICK_X = "LeftJoystickX";
+    public const string CONTROLLER_LEFT_JOYSTICK_Y = "LeftJoystickY";
+    public const string CONTROLLER_RIGHT_JOYSTICK_X = "RightJoystickX";
+    public const string CONTROLLER_RIGHT_JOYSTICK_Y = "RightJoystickY";
+
+    public const float CONTROLLER_JOYSTICK_THRESHOLD = 0.45f;
+
+    public const string CONTROLLER_TYPE_XBOX360 = "Xbox 360";
+    public const string CONTROLLER_TYPE_KEYBOARD = "Keyboard";
 
     // **********************************************************************
     // TAGS

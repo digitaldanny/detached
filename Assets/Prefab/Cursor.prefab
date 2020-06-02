@@ -96,4 +96,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 2
   xOffset: 0
-  yOffset: 0
+  yOffset: 0.5
