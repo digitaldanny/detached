@@ -105,11 +105,16 @@ public class EntityPlayerDefault : Entity
     */
     public override void HandleSpecial(Vector2 cursorDir)
     {
-        // check if teleport point is still valid
-        if (this.prevTeleportPoint.valid)
+        // If teleport point is still valid, teleport to location
+        // and destroy the teleport point.
+        if (prevTeleportPoint)
         {
-            this.prevTeleportPoint.valid = false; // make sure players can't teleport to same location twice
-            transform.position = this.prevTeleportPoint.location; // teleport
+            transform.position = prevTeleportPoint.GetComponent<TeleportPoint>().GetPosition();
+            Destroy(prevTeleportPoint);
+        }
+        else
+        {
+            Debug.Log("Teleport point isn't valid anymore");
         }
     }
 

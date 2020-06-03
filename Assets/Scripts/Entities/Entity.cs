@@ -10,34 +10,6 @@ public class Entity : MonoBehaviour
     //                          CLASS STRUCTURES
     // **********************************************************************
 
-
-    /*
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: TeleportPoint
-     * @valid
-     *  Is the player allowed to teleport to the point?
-     * @location
-     *  Transform position to teleport to.
-     * @velocity
-     *  Velocity that the spirit was traveling at when player chose to 
-     *  teleport.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected class TeleportPoint
-    {
-        public bool valid;
-        public Vector2 location;
-        public Vector2 velocity;
-
-        // default constructor
-        public TeleportPoint()
-        {
-            valid = false;
-            location = new Vector2(0f, 0f);
-            velocity = new Vector2(0f, 0f);
-        }
-    }
-
     /*
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: ControllerConfigs
@@ -103,7 +75,7 @@ public class Entity : MonoBehaviour
      *  This is based on how many jumpPowers are defined in config variables.
      * @allowedJumpTime
      *  Allow the player to jump again after delay. Avoids spamming double jumps.
-     * @previousTeleportPoint
+      *@prevTeleportPoint
      *  Keeps track of previous position that the player teleported from so the 
      *  player can return.
      * -------------------------------------------------------------------
@@ -124,13 +96,16 @@ public class Entity : MonoBehaviour
     [Header("SPRITE")]
     [SerializeField] protected bool spriteFacingRight = true;
 
+    [Header("TELEPORT")]
+    [SerializeField] GameObject teleportPointPrefab;
+
     // State
     protected bool isAlive;
     protected bool isGrounded;
     protected int currentNumberJumps;
     protected int maxNumberJumps;
     protected float allowedJumpTime;
-    protected TeleportPoint prevTeleportPoint;
+    protected GameObject prevTeleportPoint;
 
     // Cache
     protected Rigidbody2D myRigidbody;
@@ -152,7 +127,6 @@ public class Entity : MonoBehaviour
         isGrounded = true;
         maxNumberJumps = jumpSpeed.Length;
         allowedJumpTime = 0;
-        prevTeleportPoint = new TeleportPoint();
 
         // Set up cache
         myRigidbody = GetComponent<Rigidbody2D>();
@@ -292,10 +266,21 @@ public class Entity : MonoBehaviour
     */
     public virtual void TeleportHere(Vector2 location, Vector2 velocity)
     {
-        // save current location as the previous teleport point in case player
-        // tries to teleport back.
-        this.prevTeleportPoint.valid = true;
-        this.prevTeleportPoint.location = transform.position;
+        // If a teleport point doesn't exist yet, instantiate a new one.
+        if (!prevTeleportPoint)
+        {
+            Debug.Log("Creating new teleport point");
+            // save current location as the previous teleport point in case player
+            // tries to teleport back.
+            prevTeleportPoint = Instantiate(
+                teleportPointPrefab,
+                transform.position,
+                Quaternion.identity
+            ) as GameObject;
+        }
+
+        // modify teleport point's position after every teleport.
+        prevTeleportPoint.GetComponent<TeleportPoint>().SetLocation(transform.position);
 
         // play teleportation animation
 
