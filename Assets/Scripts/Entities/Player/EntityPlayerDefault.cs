@@ -123,7 +123,7 @@ public class EntityPlayerDefault : Entity
         base.HandleRun(controlThrow);
 
         // Tell animator when to play run animator
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= GlobalConfigs.VelocityEpsilon;
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed); 
     }
 

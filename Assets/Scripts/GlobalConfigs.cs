@@ -11,8 +11,11 @@
     public const string CONTROLLER_LEFT_JOYSTICK_Y = "LeftJoystickY";
     public const string CONTROLLER_RIGHT_JOYSTICK_X = "RightJoystickX";
     public const string CONTROLLER_RIGHT_JOYSTICK_Y = "RightJoystickY";
+    public const string CONTROLLER_HORIZONTAL = "Horizontal";
+    public const string CONTROLLER_VERTICAL = "Vertical";
 
     public const float CONTROLLER_JOYSTICK_THRESHOLD = 0.45f;
+    public const float CONTROLLER_KEYBOARD_THRESHOLD = 0.05f;
 
     public const string CONTROLLER_TYPE_XBOX360 = "Xbox 360";
     public const string CONTROLLER_TYPE_KEYBOARD = "Keyboard";
@@ -51,5 +54,5 @@
     // **********************************************************************
     // MISC
     // **********************************************************************
-    public const float Epsilon = 0.00001f;
+    public const float VelocityEpsilon = 0.05f;
 }

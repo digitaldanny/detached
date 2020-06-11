@@ -166,4 +166,5 @@ MonoBehaviour:
   fallSpeed: 240
   secondsBetweenDoubleJump: 0.1
   spriteFacingRight: 1
-  verticalEase: 0.2
+  teleportPointPrefab: {fileID: 0}
+  verticalEase: 0.1

@@ -68,10 +68,32 @@ public class UserController : MonoBehaviour
     {
         // left to right = -1 to +1
         float controlThrow = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_LEFT_JOYSTICK_X);
-        if (entity)
-        {
-            entity.HandleRun(controlThrow);
-        }
+        float keyboardThrow = CrossPlatformInputManager.GetAxisRaw(GlobalConfigs.CONTROLLER_HORIZONTAL);
+
+        // Determine if input should come from keyboard or gamepad and which controller
+        // threshold to use.
+        bool usingGamepad = Mathf.Abs(controlThrow) > Mathf.Abs(keyboardThrow);
+        float finalThrow = (usingGamepad) ? controlThrow : keyboardThrow;
+        float finalThreshold = (usingGamepad) ? GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD : GlobalConfigs.CONTROLLER_KEYBOARD_THRESHOLD;
+
+        // Forcing gamepad and keyboard input to either -1, 0, or 1 will interpret well
+        // to keyboard input.
+        float maxThrow = 1.0f;
+        float noMovement = 0.0f;
+
+        // Set throw to max left or right values so that gameplay is identical for 
+        // gamepad and keyboard controls.
+        if (finalThrow >= finalThreshold)
+            finalThrow = maxThrow;
+        else if (finalThrow <= -1f * finalThreshold)
+            finalThrow = -1f * maxThrow;
+        else
+            finalThrow = noMovement;
+
+        Debug.Log(finalThrow + "----- " + finalThreshold);
+
+        // Actual run implementation varies between entities.
+        if (entity) { entity.HandleRun(finalThrow); }
     }
 
     private void HandleVertical()
