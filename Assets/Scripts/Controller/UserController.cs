@@ -25,7 +25,7 @@ public class UserController : MonoBehaviour
     Cursor cursorComponent; // cursor component of the game object
 
     // **********************************************************************
-    //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
+    //                MONO BEHAVIOUR CLASS OVERRIDE METHODS
     // **********************************************************************
 
     private void Start()
@@ -89,8 +89,6 @@ public class UserController : MonoBehaviour
             finalThrow = -1f * maxThrow;
         else
             finalThrow = noMovement;
-
-        Debug.Log(finalThrow + "----- " + finalThreshold);
 
         // Actual run implementation varies between entities.
         if (entity) { entity.HandleRun(finalThrow); }
