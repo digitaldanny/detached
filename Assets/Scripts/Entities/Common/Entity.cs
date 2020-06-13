@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
@@ -84,6 +85,9 @@ public class Entity : MonoBehaviour
     */
 
     // Configs
+    [Header("HEALTH")]
+    [SerializeField] protected int maxHealth = 1;
+
     [Header("RUN")]
     [SerializeField] protected float maxRunSpeed = 15f;
     [SerializeField] protected float runAcceleration = 2f;
@@ -106,6 +110,7 @@ public class Entity : MonoBehaviour
     protected int maxNumberJumps;
     protected float allowedJumpTime;
     protected GameObject prevTeleportPoint;
+    [SerializeField] protected int health;
 
     // Cache
     protected Rigidbody2D myRigidbody;
@@ -127,6 +132,7 @@ public class Entity : MonoBehaviour
         isGrounded = true;
         maxNumberJumps = jumpSpeed.Length;
         allowedJumpTime = 0;
+        health = maxHealth;
 
         // Set up cache
         myRigidbody = GetComponent<Rigidbody2D>();
@@ -156,8 +162,7 @@ public class Entity : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision) { OnCollisionEnter2DE(collision); }
     protected void OnCollisionExit2DE(Collision2D collision)
     {
-        // If leaving the ground:
-        //  1. Update the isGrounded state variable.
+        // If leaving the ground, update the isGrounded state variable.
         if (!myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
         {
             this.isGrounded = false;
@@ -254,6 +259,54 @@ public class Entity : MonoBehaviour
             // in a row than allowed.
             this.currentNumberJumps++;
         }
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleDamage
+     * This function handles basic KNOCKBACK and HEALTH REDUCTION; however,
+     * it does not handle what to do with the entity once health goes 
+     * below 0.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public virtual void HandleDamage(DamageUnit du)
+    {
+        // apply damage
+        this.health -= du.damage;
+
+        // determine direction to apply knockback to
+        if (du.origin.x > transform.position.x) // to the left if entity is to the left of enemy
+            du.knockback.x *= -1;
+        
+        // if (du.origin.y < transform.position.y) // downward if player is below enemy
+        //     du.knockback.y *= -1;
+
+        // stun the entity and apply the knockback
+        StartCoroutine(DisableControlsForSeconds(du.stunTime));
+        myRigidbody.velocity = du.knockback;
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: DisableControlsForSeconds
+     * Coroutine to disable controls for a short period of time.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    IEnumerator DisableControlsForSeconds(float stunTime)
+    {
+        // Disable entity controls
+        ControllerConfigs configs = new ControllerConfigs();
+        configs.controllerEnabled = false;
+        configs.entityToControl = this;
+        configs.cursorEnabled = true;
+        SetControllerConfigs(configs);
+
+        // wait for stun time
+        yield return new WaitForSeconds(stunTime);
+
+        // re-enable entity controls
+        configs.controllerEnabled = true;
+        SetControllerConfigs(configs);
     }
 
     /* 

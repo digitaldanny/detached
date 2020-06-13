@@ -132,4 +132,16 @@ public class EntityPlayerDefault : Entity
         base.FreezePlayer();
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: HandleDamage
+     * This function handles whether this Entity should take damage from
+     * external damage dealers.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public override void HandleDamage(DamageUnit du) 
+    {
+        base.HandleDamage(du);
+    }
 }

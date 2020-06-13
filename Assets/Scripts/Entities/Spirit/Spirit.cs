@@ -151,6 +151,8 @@ public class Spirit : Entity
     protected override void FallMultiplier() { return; }
     protected override void FreezePlayer() { return; }
 
+    public override void HandleDamage(DamageUnit du) { return; }
+
 
     // **********************************************************************
     //                      PUBLIC METHODS / COROUTINES

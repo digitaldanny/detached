@@ -15,6 +15,7 @@ public class UserController : MonoBehaviour
     [SerializeField] Vector2 defaultCursorDir;
 
     // State
+
     string controllerType; // is game being controlled by keyboard/mouse or xbox 360?
     Vector2 cursorDir; // direction that right joystick OR mouse is pointing at
     bool isControllable;
