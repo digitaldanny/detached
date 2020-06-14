@@ -54,5 +54,6 @@
     // **********************************************************************
     // MISC
     // **********************************************************************
-    public const float VelocityEpsilon = 0.05f;
+    public const float ENTITY_RUN_VELOCITY_EPSILON = 0.05f;
+    public const int ENTITY_MAX_HEALTH = 20;
 }

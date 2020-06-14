@@ -150,7 +150,6 @@ public class Spirit : Entity
     public override void HandleSpecial(Vector2 cursorDir) { return; }
     protected override void FallMultiplier() { return; }
     protected override void FreezePlayer() { return; }
-
     public override void HandleDamage(DamageUnit du) { return; }
 
 

@@ -47,6 +47,7 @@ public class EntityPlayerDefault : Entity
 
     // Cache
     protected Animator myAnimator;
+    protected CheckpointManager gameSession;
 
     // **********************************************************************
     //                       ENTITY OVERLOAD METHODS
@@ -58,6 +59,9 @@ public class EntityPlayerDefault : Entity
 
         // Cache
         myAnimator = GetComponent<Animator>();
+
+        gameSession = FindObjectOfType<CheckpointManager>();
+        if (gameSession == null) { Debug.Log("ERROR (EntityPlayerDefault.Start): Could not find GameSession object."); }
 
         // Start the game with the cameras pointed at the player
         SetEntityForPlayerCameraToFollow(transform);
@@ -123,7 +127,7 @@ public class EntityPlayerDefault : Entity
         base.HandleRun(controlThrow);
 
         // Tell animator when to play run animator
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= GlobalConfigs.VelocityEpsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= GlobalConfigs.ENTITY_RUN_VELOCITY_EPSILON;
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed); 
     }
 
@@ -137,11 +141,26 @@ public class EntityPlayerDefault : Entity
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: HandleDamage
      * This function handles whether this Entity should take damage from
-     * external damage dealers.
+     * external damage dealers. if the health is less than or equal to 0,
+     * the player respawns at the previous checkpoint.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     public override void HandleDamage(DamageUnit du) 
     {
         base.HandleDamage(du);
+
+        if (health <= 0)
+        {
+            Debug.Log("ERROR (EntityPlayerDefault.HandleDamage): Player died, respawning at last checkpoint.");
+            
+            // Reset player health
+            health = maxHealth;
+
+            // Move player to previous checkpoint
+            transform.position = gameSession.currentCheckpoint.position;
+
+            // stop any movement caused by player getting hit
+            myRigidbody.velocity = new Vector2(0f, 0f);
+        }
     }
 }

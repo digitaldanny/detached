@@ -86,7 +86,7 @@ public class Entity : MonoBehaviour
 
     // Configs
     [Header("HEALTH")]
-    [SerializeField] protected int maxHealth = 1;
+    [SerializeField] public int maxHealth = 1;
 
     [Header("RUN")]
     [SerializeField] protected float maxRunSpeed = 15f;
@@ -110,7 +110,7 @@ public class Entity : MonoBehaviour
     protected int maxNumberJumps;
     protected float allowedJumpTime;
     protected GameObject prevTeleportPoint;
-    [SerializeField] protected int health;
+    [SerializeField] public int health;
 
     // Cache
     protected Rigidbody2D myRigidbody;

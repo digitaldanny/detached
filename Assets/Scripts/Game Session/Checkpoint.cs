@@ -17,7 +17,7 @@ public class Checkpoint : MonoBehaviour
 
     // Cache
     SpriteRenderer spriteRenderer;
-    GameSession gameSession;
+    CheckpointManager gameSession;
 
     // **********************************************************************
     //                MONO BEHAVIOUR CLASS OVERRIDE METHODS
@@ -30,7 +30,7 @@ public class Checkpoint : MonoBehaviour
 
         // Cache
         spriteRenderer = GetComponent<SpriteRenderer>();
-        gameSession = FindObjectOfType<GameSession>();
+        gameSession = FindObjectOfType<CheckpointManager>();
 
         // Perform validity check on the checkpoint numbers
         SceneCheckpointValidityCheck();

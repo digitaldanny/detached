@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameSession : MonoBehaviour
+public class CheckpointManager : MonoBehaviour
 {
     // **********************************************************************
     //                          CLASS PARAMETERS
