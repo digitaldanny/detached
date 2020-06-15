@@ -160,6 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63cd626796c17ec4f8c96ccb5d704d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 1
   maxRunSpeed: 15
   runAcceleration: 2
   jumpSpeed: []
@@ -167,4 +168,5 @@ MonoBehaviour:
   secondsBetweenDoubleJump: 0.1
   spriteFacingRight: 1
   teleportPointPrefab: {fileID: 0}
-  verticalEase: 0.1
+  health: 0
+  verticalEase: 0.2

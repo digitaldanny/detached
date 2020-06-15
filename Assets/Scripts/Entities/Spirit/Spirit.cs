@@ -31,13 +31,13 @@ public class Spirit : Entity
 
     void Start()
     {
-        base.StartE();
+        base.DefaultGlobals();
 
         // Make player controls connect to spirit entity
         SetControllerConfigs(new ControllerConfigs(true, this, false));
 
         // set up states
-        isGrounded = false;
+        _isGrounded = false;
 
         // set up cache
         // myRigidbody = GetComponent<Rigidbody2D>();
@@ -90,7 +90,7 @@ public class Spirit : Entity
             myFloorCollider.enabled = false;
 
             // Change state to grounded so player will automatically teleport here.
-            isGrounded = true;
+            _isGrounded = true;
 
             // Force spirit to stick to ground at the contact point
             // Also, offset the y position by the sprite's y extent.
@@ -98,7 +98,7 @@ public class Spirit : Entity
             transform.position = contactPoint + new Vector2(0f, spriteExtentY);
 
             // Stop all movement
-            myRigidbody.velocity = new Vector2(0f, 0f);
+            _myRigidbody.velocity = new Vector2(0f, 0f);
 
             // Play hitting floor sound
 
@@ -118,9 +118,9 @@ public class Spirit : Entity
     */
     public override void HandleVertical(float controlThrow)
     {
-        if (!isGrounded)
+        if (!_isGrounded)
         {
-            myRigidbody.velocity += new Vector2(0f, verticalEase * controlThrow);
+            _myRigidbody.velocity += new Vector2(0f, verticalEase * controlThrow);
         }
     }
 
@@ -135,7 +135,7 @@ public class Spirit : Entity
     {
         // Teleport player to this location
         Entity player = GetPlayerReference().GetComponent<Entity>();
-        player.TeleportHere(transform.position, myRigidbody.velocity);
+        player.TeleportHere(transform.position, _myRigidbody.velocity);
         this.GiveUpControlToEntity(player);
     }
 

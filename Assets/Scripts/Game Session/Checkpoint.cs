@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
@@ -10,33 +9,27 @@ public class Checkpoint : MonoBehaviour
     // Configs
     [SerializeField] public int number;
     [SerializeField] public Color activationColor;
-    [SerializeField] public Color cpNumberInvalidColor;
 
     // State
-    public Vector2 position; // contains location of this checkpoint
 
     // Cache
-    SpriteRenderer spriteRenderer;
-    CheckpointManager gameSession;
+    protected SpriteRenderer spriteRenderer;
+    protected CheckpointManager checkpointManager;
 
     // **********************************************************************
     //                MONO BEHAVIOUR CLASS OVERRIDE METHODS
     // **********************************************************************
 
-    private void Start()
+    private void Start() { StartE(); }
+    protected void StartE()
     {
-        // State
-        position = transform.position;
-
         // Cache
         spriteRenderer = GetComponent<SpriteRenderer>();
-        gameSession = FindObjectOfType<CheckpointManager>();
-
-        // Perform validity check on the checkpoint numbers
-        SceneCheckpointValidityCheck();
+        checkpointManager = FindObjectOfType<CheckpointManager>();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision) { OnTriggerEnter2DE(collision); }
+    protected void OnTriggerEnter2DE(Collider2D collision)
     {
         PlayerActivated(collision);
     }
@@ -47,30 +40,6 @@ public class Checkpoint : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SceneCheckpointValidityCheck
-     * This function checks if there are any other checkpoints with the
-     * same checkpoint number in the scene. This is useful because multiple
-     * checkpoints with the same number will break the level playability.
-     * 
-     * NOTE: This function could be bad for performance if there is a 
-     * large number of checkpoints in a single scene.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    private void SceneCheckpointValidityCheck()
-    {
-        var allCheckpoints = FindObjectsOfType<Checkpoint>();
-        foreach (Checkpoint cp in allCheckpoints)
-        {
-            if (cp.number == this.number && cp != this)
-            {
-                spriteRenderer.color = this.cpNumberInvalidColor;
-                Debug.Log("ERROR (SceneCheckpointValidityCheck): Multiple checkpoints have the same checkpoint number!!");
-            }
-        }
-    }
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: PlayerActivated
      * Check if the player collided with the checkpoint. If the checkpoint
      * number is higher than the GameSession's current checkpoint number,
@@ -78,18 +47,21 @@ public class Checkpoint : MonoBehaviour
      * location.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    private void PlayerActivated(Collider2D collision)
+    protected void PlayerActivated(Collider2D collision)
     {
         if (collision.gameObject.tag == GlobalConfigs.TAG_PLAYER)
         {   
             // Update game session's checkpoint if player has located
             // a higher level location.
-            if (gameSession.currentCheckpoint.number < this.number)
+            if (checkpointManager.currentCheckpoint.number <= this.number)
             {
-                gameSession.currentCheckpoint = this;
+                checkpointManager.currentCheckpoint = this;
 
                 // Change to activation color
                 spriteRenderer.color = this.activationColor;
+
+                // Save the player state at the checkpoint
+                checkpointManager.checkpointedPlayer = collision.gameObject;
             }
         }
     }

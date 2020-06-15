@@ -24,7 +24,7 @@ public class EntityEnemyNormal : Entity
 
     private void Start()
     {
-        base.StartE();
+        base.DefaultGlobals();
 
         // Cache
         myAnimator = GetComponent<Animator>();

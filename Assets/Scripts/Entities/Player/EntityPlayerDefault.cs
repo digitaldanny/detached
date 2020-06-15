@@ -39,15 +39,12 @@ public class EntityPlayerDefault : Entity
     [SerializeField] protected GameObject spirit;
     [SerializeField] protected float launchPower = 30f;
     [SerializeField] protected float verticalLaunchOffset = 0.5f;
-    [SerializeField] protected float maxTimeInSpiritForm = 5f;
-    [SerializeField] protected float spiritRechargeDelay = 2f;
-    [SerializeField] protected float spiritRechargeAmount = 0.5f;
 
     // State
 
     // Cache
     protected Animator myAnimator;
-    protected CheckpointManager gameSession;
+    protected CheckpointManager checkpointManager;
 
     // **********************************************************************
     //                       ENTITY OVERLOAD METHODS
@@ -55,20 +52,78 @@ public class EntityPlayerDefault : Entity
 
     private void Start()
     {
-        base.StartE();
+        DefaultGlobals();
+        DefaultSettings();
+    }
+
+    // **********************************************************************
+    //                           PROTECTED METHODS
+    // **********************************************************************
+
+    protected override void DefaultGlobals()
+    {
+        base.DefaultGlobals();
 
         // Cache
         myAnimator = GetComponent<Animator>();
+        checkpointManager = FindObjectOfType<CheckpointManager>();
+        if (checkpointManager == null) { Debug.Log("ERROR (EntityPlayerDefault.Start): Could not find CheckpointManager object."); }
+    }
 
-        gameSession = FindObjectOfType<CheckpointManager>();
-        if (gameSession == null) { Debug.Log("ERROR (EntityPlayerDefault.Start): Could not find GameSession object."); }
-
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: DefaultSettings
+     * Set up the following configurations.
+     * - Player camera follows this object.
+     * - Controller is enabled for this object and cursor is turned on.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected void DefaultSettings()
+    {
         // Start the game with the cameras pointed at the player
         SetEntityForPlayerCameraToFollow(transform);
 
         // Players should start the game being able to control the player.
         SetControllerConfigs(new ControllerConfigs(true, this, true));
     }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: FreezePlayer
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected override void FreezePlayer()
+    {
+        base.FreezePlayer();
+        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
+    }
+
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: Die
+     * This function handles whether this Entity should take damage from
+     * external damage dealers. if the health is less than or equal to 0,
+     * the player respawns at the previous checkpoint.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected override void Die()
+    {
+        // Disable all components set up during instantiation
+        SetControllerConfigs(new ControllerConfigs(false, null, false));
+        SetEntityForPlayerCameraToFollow(null);
+
+        // Play death animation, sound effect
+
+        // reconfigure player to be the same as the last checkpoint
+        checkpointManager.RespawnAtLastCheckpoint(this.gameObject);
+
+        // Re-enable all components set up during instantiation
+        DefaultSettings();
+    }
+
+    // **********************************************************************
+    //                            PUBLIC METHODS
+    // **********************************************************************
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -111,10 +166,10 @@ public class EntityPlayerDefault : Entity
     {
         // If teleport point is still valid, teleport to location
         // and destroy the teleport point.
-        if (prevTeleportPoint)
+        if (_prevTeleportPoint)
         {
-            transform.position = prevTeleportPoint.GetComponent<TeleportPoint>().GetPosition();
-            Destroy(prevTeleportPoint);
+            transform.position = _prevTeleportPoint.GetComponent<TeleportPoint>().GetPosition();
+            Destroy(_prevTeleportPoint);
         }
         else
         {
@@ -127,14 +182,8 @@ public class EntityPlayerDefault : Entity
         base.HandleRun(controlThrow);
 
         // Tell animator when to play run animator
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= GlobalConfigs.ENTITY_RUN_VELOCITY_EPSILON;
+        bool playerHasHorizontalSpeed = Mathf.Abs(_myRigidbody.velocity.x) >= GlobalConfigs.ENTITY_RUN_VELOCITY_EPSILON;
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, playerHasHorizontalSpeed); 
-    }
-
-    protected override void FreezePlayer() 
-    {
-        base.FreezePlayer();
-        myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
 
     /* 
@@ -151,16 +200,7 @@ public class EntityPlayerDefault : Entity
 
         if (health <= 0)
         {
-            Debug.Log("ERROR (EntityPlayerDefault.HandleDamage): Player died, respawning at last checkpoint.");
-            
-            // Reset player health
-            health = maxHealth;
-
-            // Move player to previous checkpoint
-            transform.position = gameSession.currentCheckpoint.position;
-
-            // stop any movement caused by player getting hit
-            myRigidbody.velocity = new Vector2(0f, 0f);
+            Die();
         }
     }
 }

@@ -86,58 +86,73 @@ public class Entity : MonoBehaviour
 
     // Configs
     [Header("HEALTH")]
-    [SerializeField] public int maxHealth = 1;
+    [SerializeField] protected int _maxHealth = 1;
 
     [Header("RUN")]
-    [SerializeField] protected float maxRunSpeed = 15f;
-    [SerializeField] protected float runAcceleration = 2f;
+    [SerializeField] protected float _maxRunSpeed = 15f;
+    [SerializeField] protected float _runAcceleration = 2f;
 
     [Header("JUMP")]
-    [SerializeField] protected float[] jumpSpeed;
-    [SerializeField] protected float fallSpeed = 240f;
-    [SerializeField] protected float secondsBetweenDoubleJump = 0.1f;
+    [SerializeField] protected float[] _jumpSpeed;
+    [SerializeField] protected float _fallSpeed = 240f;
+    [SerializeField] protected float _secondsBetweenDoubleJump = 0.1f;
 
     [Header("SPRITE")]
-    [SerializeField] protected bool spriteFacingRight = true;
+    [SerializeField] protected bool _spriteFacingRight = true;
 
     [Header("TELEPORT")]
-    [SerializeField] GameObject teleportPointPrefab;
+    [SerializeField] protected GameObject _teleportPointPrefab;
 
     // State
-    protected bool isAlive;
-    protected bool isGrounded;
-    protected int currentNumberJumps;
-    protected int maxNumberJumps;
-    protected float allowedJumpTime;
-    protected GameObject prevTeleportPoint;
-    [SerializeField] public int health;
+    protected bool _isAlive;
+    protected bool _isGrounded;
+    protected int _currentNumberJumps;
+    protected int _maxNumberJumps;
+    protected float _allowedJumpTime;
+    protected GameObject _prevTeleportPoint;
+    [SerializeField] protected int _health;
 
     // Cache
-    protected Rigidbody2D myRigidbody;
-    protected Collider2D myCollider2D;
-    protected SpriteRenderer mySpriteRenderer;
+    protected Rigidbody2D _myRigidbody;
+    protected Collider2D _myCollider2D;
+    protected SpriteRenderer _mySpriteRenderer;
 
+    // **********************************************************************
+    //                          GETTERS / SETTERS
+    // **********************************************************************
+
+    public int maxHealth
+    {
+        get => _maxHealth;
+        set { _maxHealth = value; }
+    }
+
+    public int health
+    {
+        get => _health;
+        set { _health = value; }
+    }
 
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
 
 
-    void Start() { StartE(); }
-    protected void StartE()
+    void Start() { DefaultGlobals(); }
+    protected virtual void DefaultGlobals()
     {
         // Set up states
-        currentNumberJumps = 0;
-        isAlive = true;
-        isGrounded = true;
-        maxNumberJumps = jumpSpeed.Length;
-        allowedJumpTime = 0;
-        health = maxHealth;
+        _currentNumberJumps = 0;
+        _isAlive = true;
+        _isGrounded = true;
+        _maxNumberJumps = _jumpSpeed.Length;
+        _allowedJumpTime = 0;
+        _health = _maxHealth;
 
         // Set up cache
-        myRigidbody = GetComponent<Rigidbody2D>();
-        myCollider2D = GetComponent<Collider2D>();
-        mySpriteRenderer = GetComponent<SpriteRenderer>();
+        _myRigidbody = GetComponent<Rigidbody2D>();
+        _myCollider2D = GetComponent<Collider2D>();
+        _mySpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update() { UpdateE(); }
@@ -152,10 +167,10 @@ public class Entity : MonoBehaviour
         // If landing on the ground:
         //  1. Reset current number of jumps so player can perform double jumps.
         //  2. Update the isGrounded state variable.
-        if (myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
+        if (_myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
         {
-            this.currentNumberJumps = 0;
-            this.isGrounded = true;
+            this._currentNumberJumps = 0;
+            this._isGrounded = true;
         }
     }
 
@@ -163,9 +178,9 @@ public class Entity : MonoBehaviour
     protected void OnCollisionExit2DE(Collision2D collision)
     {
         // If leaving the ground, update the isGrounded state variable.
-        if (!myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
+        if (!_myCollider2D.IsTouchingLayers(LayerMask.GetMask(GlobalConfigs.LAYER_COLLISION_GROUND)))
         {
-            this.isGrounded = false;
+            this._isGrounded = false;
         }
     }
 
@@ -173,7 +188,6 @@ public class Entity : MonoBehaviour
     // **********************************************************************
     //                 PUBLIC + VIRTUAL METHODS / COROUTINES
     // **********************************************************************
-
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
@@ -185,9 +199,9 @@ public class Entity : MonoBehaviour
     protected virtual void FallMultiplier()
     {
         // only apply falling multiplier if player is already falling
-        if (myRigidbody.velocity.y < Mathf.Epsilon)
+        if (_myRigidbody.velocity.y < Mathf.Epsilon)
         {
-            myRigidbody.velocity += Vector2.down * fallSpeed * Time.deltaTime;
+            _myRigidbody.velocity += Vector2.down * _fallSpeed * Time.deltaTime;
         }
     }
 
@@ -201,7 +215,7 @@ public class Entity : MonoBehaviour
     protected virtual void FreezePlayer()
     {
         SetControllerConfigs(new ControllerConfigs(false, this, true));
-        myRigidbody.velocity = new Vector2(0f, myRigidbody.velocity.y);
+        _myRigidbody.velocity = new Vector2(0f, _myRigidbody.velocity.y);
     }
 
     /* 
@@ -212,22 +226,22 @@ public class Entity : MonoBehaviour
     public virtual void HandleRun(float controlThrow)
     {
         // Calculate new velocity using acceleration with a max run speed
-        float xVelocity = myRigidbody.velocity.x + controlThrow * this.runAcceleration;
-        float xVelocityClamped = Mathf.Clamp(xVelocity, -1f * this.maxRunSpeed, this.maxRunSpeed);
-        Vector2 playerVelocity = new Vector2(xVelocityClamped, myRigidbody.velocity.y);
+        float xVelocity = _myRigidbody.velocity.x + controlThrow * this._runAcceleration;
+        float xVelocityClamped = Mathf.Clamp(xVelocity, -1f * this._maxRunSpeed, this._maxRunSpeed);
+        Vector2 playerVelocity = new Vector2(xVelocityClamped, _myRigidbody.velocity.y);
 
-        myRigidbody.velocity = playerVelocity; // assign new run speed to player
+        _myRigidbody.velocity = playerVelocity; // assign new run speed to player
 
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) >= Mathf.Epsilon;
+        bool playerHasHorizontalSpeed = Mathf.Abs(_myRigidbody.velocity.x) >= Mathf.Epsilon;
 
         // check if player's sprite should be flipped to face direction it is moving
         if (playerHasHorizontalSpeed)
         {
             // Sprite direction is implemented using XNOR boolean logic
             // XNOR Truth table reference: https://en.scratch-wiki.info/wiki/Truth_Table
-            bool A = Mathf.Sign(myRigidbody.velocity.x) <= 0.0f;
-            bool B = this.spriteFacingRight;
-            mySpriteRenderer.flipX = A == B; // XNOR logic
+            bool A = Mathf.Sign(_myRigidbody.velocity.x) <= 0.0f;
+            bool B = this._spriteFacingRight;
+            _mySpriteRenderer.flipX = A == B; // XNOR logic
         }
     }
 
@@ -243,21 +257,21 @@ public class Entity : MonoBehaviour
         // Check if the player has met the delay requirement between jumps.
         // If he has, update the allowed jump time again for future jumps.
         // If he has not, return and wait for allowed jump time.
-        if (Time.time >= this.allowedJumpTime)
-            this.allowedJumpTime = Time.time + this.secondsBetweenDoubleJump;
+        if (Time.time >= this._allowedJumpTime)
+            this._allowedJumpTime = Time.time + this._secondsBetweenDoubleJump;
         else
             return;
 
         // Player is always allowed to jump if touching the ground.
         // If already in the air, player can only jump if he hasn't met the
         // max number of jumps already.
-        if (this.currentNumberJumps < this.maxNumberJumps)
+        if (this._currentNumberJumps < this._maxNumberJumps)
         {
-            Jump(this.jumpSpeed[currentNumberJumps]);
+            Jump(this._jumpSpeed[_currentNumberJumps]);
 
             // Increment counter to make sure player doesn't make more jumps
             // in a row than allowed.
-            this.currentNumberJumps++;
+            this._currentNumberJumps++;
         }
     }
 
@@ -272,7 +286,7 @@ public class Entity : MonoBehaviour
     public virtual void HandleDamage(DamageUnit du)
     {
         // apply damage
-        this.health -= du.damage;
+        this._health -= du.damage;
 
         // determine direction to apply knockback to
         if (du.origin.x > transform.position.x) // to the left if entity is to the left of enemy
@@ -283,7 +297,7 @@ public class Entity : MonoBehaviour
 
         // stun the entity and apply the knockback
         StartCoroutine(DisableControlsForSeconds(du.stunTime));
-        myRigidbody.velocity = du.knockback;
+        _myRigidbody.velocity = du.knockback;
     }
 
     /* 
@@ -320,20 +334,20 @@ public class Entity : MonoBehaviour
     public virtual void TeleportHere(Vector2 location, Vector2 velocity)
     {
         // If a teleport point doesn't exist yet, instantiate a new one.
-        if (!prevTeleportPoint)
+        if (!_prevTeleportPoint)
         {
             Debug.Log("Creating new teleport point");
             // save current location as the previous teleport point in case player
             // tries to teleport back.
-            prevTeleportPoint = Instantiate(
-                teleportPointPrefab,
+            _prevTeleportPoint = Instantiate(
+                _teleportPointPrefab,
                 transform.position,
                 Quaternion.identity
             ) as GameObject;
         }
 
         // modify teleport point's position after every teleport.
-        prevTeleportPoint.GetComponent<TeleportPoint>().SetLocation(transform.position);
+        _prevTeleportPoint.GetComponent<TeleportPoint>().SetLocation(transform.position);
 
         // play teleportation animation
 
@@ -341,7 +355,7 @@ public class Entity : MonoBehaviour
 
         // teleport to the requested location and add the requested velocity
         transform.position = location;
-        myRigidbody.velocity = velocity;
+        _myRigidbody.velocity = velocity;
     }
 
     /* 
@@ -378,6 +392,14 @@ public class Entity : MonoBehaviour
     */
     public virtual void HandleSpecial(Vector2 cursorDir) { return; }
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: SetToDefaults
+     * Set player to default properties.
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    public virtual void SetToDefaults() { return; }
+
 
     // **********************************************************************
     //                        PROTECTED METHODS
@@ -394,11 +416,18 @@ public class Entity : MonoBehaviour
     {
         // Add upward force to player so it jumps.
         Vector2 jumpVelocityToAdd = new Vector2(0f, jumpPowerCustom);
-        myRigidbody.velocity += jumpVelocityToAdd;
+        _myRigidbody.velocity += jumpVelocityToAdd;
     }
 
+    /* 
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+     * SUMMARY: Die
+     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+    */
+    protected virtual void Die() { return; }
+
     // **********************************************************************
-    //                        DEPENDENCY METHODS
+    //                 METHODS WITH EXTERNAL DEPENDENCIES
     // **********************************************************************
 
     /* 

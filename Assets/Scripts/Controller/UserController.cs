@@ -37,18 +37,21 @@ public class UserController : MonoBehaviour
 
     private void Update()
     {
-        UpdateCursorDir(); // update cursorDir state variable based on joystick OR mouse.
-        UpdateCursorSprite(); // update joystick+mouse position AND position of cursor if enabled. 
-
-        // Player movement that can only happen when the player is not frozen.
-        if (this.isControllable)
+        if (entity != null) // important check for when player is destroyed before a respawn
         {
-            HandleRun(); // check if player is running or if sprite should be flipped
-            HandleVertical(); // check if player is using left joystick's Y axis
-            HandleJump(); // check if player jumped
-            HandleRanged(); // check if ranged attack was used
-            HandleSpecial(); // check if special ability was used
-            HandlePunch(); // check if punch was used
+            UpdateCursorDir(); // update cursorDir state variable based on joystick OR mouse.
+            UpdateCursorSprite(); // update joystick+mouse position AND position of cursor if enabled. 
+
+            // Player movement that can only happen when the player is not frozen.
+            if (this.isControllable)
+            {
+                HandleRun(); // check if player is running or if sprite should be flipped
+                HandleVertical(); // check if player is using left joystick's Y axis
+                HandleJump(); // check if player jumped
+                HandleRanged(); // check if ranged attack was used
+                HandleSpecial(); // check if special ability was used
+                HandlePunch(); // check if punch was used
+            }
         }
     }
 
