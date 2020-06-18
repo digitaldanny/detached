@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEditor.U2D.Path.GUIFramework;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
@@ -172,6 +173,10 @@ public class Spirit : Entity
 
         // play sound
 
+        // Set entity for spirit camera to follow == player to patch issue where
+        // lookahead causes jerky re-centering when spirit spawns second time.
+        cameraManager.SetSpiritToFollow(entityGainingControl.transform);
+
         // Give player camera control
         cameraManager.SetPlayerCamera(true);
 
@@ -180,7 +185,7 @@ public class Spirit : Entity
 
         Destroy(gameObject, 0f);
     }
-
+    
     /*
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
      * SUMMARY: GetPlayerReference

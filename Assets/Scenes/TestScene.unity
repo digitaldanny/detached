@@ -266,31 +266,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1027635585, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
-      propertyPath: _jumpSpeed.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1027635585, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
-      propertyPath: _maxHealth
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1027635585, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
-      propertyPath: _jumpSpeed.Array.data[0]
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1027635585, guid: 8119e8f0a181103428f0853753ea401b, type: 3}
-      propertyPath: _jumpSpeed.Array.data[1]
+    - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
         type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -2.26
-      objectReference: {fileID: 0}
-    - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
-        type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.1
+      value: 23.9
       objectReference: {fileID: 0}
     - target: {fileID: 8874793710004259983, guid: 8119e8f0a181103428f0853753ea401b,
         type: 3}
@@ -705,11 +689,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad980451443d70438faac0bc6c235a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_LookaheadTime: 0.04
-  m_LookaheadSmoothing: 10
+  m_LookaheadTime: 0.143
+  m_LookaheadSmoothing: 3.3
   m_LookaheadIgnoreY: 0
-  m_XDamping: 0.8
-  m_YDamping: 0.8
+  m_XDamping: 0.7
+  m_YDamping: 0.9
   m_ZDamping: 0
   m_ScreenX: 0.5
   m_ScreenY: 0.5
@@ -722,7 +706,7 @@ MonoBehaviour:
   m_SoftZoneHeight: 1
   m_BiasX: 0
   m_BiasY: 0
-  m_CenterOnActivate: 1
+  m_CenterOnActivate: 0
   m_GroupFramingMode: 2
   m_AdjustmentMode: 0
   m_GroupFramingSize: 0.8

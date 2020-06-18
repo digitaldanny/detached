@@ -154,21 +154,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e2399ecd9e60fd47b685dc3ea5bedb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  maxRunSpeed: 15
-  runAcceleration: 2
-  jumpSpeed:
+  _maxHealth: 3
+  _maxRunSpeed: 15
+  _runAcceleration: 2
+  _jumpSpeed:
+  - 30
   - 25
-  - 20
-  fallSpeed: 240
-  secondsBetweenDoubleJump: 0.1
-  spriteFacingRight: 1
-  teleportPointPrefab: {fileID: 4658823631836370141, guid: daabcb4574146674280934b6c1822422,
+  _fallSpeed: 240
+  _secondsBetweenDoubleJump: 0.1
+  _spriteFacingRight: 1
+  _teleportPointPrefab: {fileID: 4658823631836370141, guid: daabcb4574146674280934b6c1822422,
     type: 3}
-  health: 0
+  _health: 0
   spirit: {fileID: 4022419655058528293, guid: da86196f508cb614cbb98e7d92272137, type: 3}
   launchPower: 20
   verticalLaunchOffset: 0.5
-  maxTimeInSpiritForm: 5
-  spiritRechargeDelay: 2
-  spiritRechargeAmount: 0.5
