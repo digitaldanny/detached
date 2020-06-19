@@ -132,7 +132,7 @@ public class Spirit : Entity
      * player to the spirit's current location and then destroys itself.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleRanged(Vector2 cursorDir)
+    public override void HandleRangedDown(Vector2 cursorDir)
     {
         // Teleport player to this location
         Entity player = GetPlayerReference().GetComponent<Entity>();
@@ -148,7 +148,7 @@ public class Spirit : Entity
     */
     public override void HandleRun(float controlThrow) { return; }
     public override void HandleJump() { return; }
-    public override void HandleSpecial(Vector2 cursorDir) { return; }
+    public override void HandleSpecialDown(Vector2 cursorDir) { return; }
     protected override void FallMultiplier() { return; }
     protected override void FreezePlayer() { return; }
     public override void HandleDamage(DamageUnit du) { return; }
@@ -181,7 +181,8 @@ public class Spirit : Entity
         cameraManager.SetPlayerCamera(true);
 
         // Give new entity control of the user input
-        SetControllerConfigs(new ControllerConfigs(true, entityGainingControl, true));
+        SetControllerConfigs(new ControllerConfigs(true, entityGainingControl, false));
+        entityGainingControl.xAxisEnabled = true; // reenable entity control of xAxis
 
         Destroy(gameObject, 0f);
     }

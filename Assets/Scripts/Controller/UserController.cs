@@ -121,13 +121,21 @@ public class UserController : MonoBehaviour
     }
 
     private void HandleRanged()
-    {
+    { 
         // Check if the player clicked the fire button
         if (CrossPlatformInputManager.GetButtonDown(GlobalConfigs.CONTROLLER_RANGED))
         {
             if (entity)
             {
-                entity.HandleRanged(this.cursorDir);
+                entity.HandleRangedDown(this.cursorDir);
+            }
+        }
+
+        if (CrossPlatformInputManager.GetButtonUp(GlobalConfigs.CONTROLLER_RANGED))
+        {
+            if (entity)
+            {
+                entity.HandleRangedUp(this.cursorDir);
             }
         }
     }
@@ -139,7 +147,7 @@ public class UserController : MonoBehaviour
         {
             if (entity)
             {
-                entity.HandleSpecial(this.cursorDir);
+                entity.HandleSpecialDown(this.cursorDir);
             }
         }
     }
@@ -207,13 +215,13 @@ public class UserController : MonoBehaviour
             case GlobalConfigs.CONTROLLER_TYPE_XBOX360:
 
                 // Capture joystick values
-                float joystickRightX = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_RIGHT_JOYSTICK_X);
-                float joystickRightY = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_RIGHT_JOYSTICK_Y);
+                float joystickLeftX = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_LEFT_JOYSTICK_X);
+                float joystickLeftY = CrossPlatformInputManager.GetAxis(GlobalConfigs.CONTROLLER_LEFT_JOYSTICK_Y);
 
                 // if being controlled by the joysticks, don't change the angle if
                 // the joystick has recentered.
-                if (Mathf.Abs(joystickRightX) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD &&
-                    Mathf.Abs(joystickRightY) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD)
+                if (Mathf.Abs(joystickLeftX) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD &&
+                    Mathf.Abs(joystickLeftY) <= GlobalConfigs.CONTROLLER_JOYSTICK_THRESHOLD)
                 {
                     break;
                 }
@@ -221,7 +229,7 @@ public class UserController : MonoBehaviour
                 {
                     // Joystick may not be at max value based on player input, so calculate
                     // the angle and produce the max vector based on the angle.
-                    float theta = Mathf.Atan2(joystickRightY, joystickRightX);
+                    float theta = Mathf.Atan2(joystickLeftY, joystickLeftX);
                     this.cursorDir.x = Mathf.Cos(theta);
                     this.cursorDir.y = Mathf.Sin(theta);
                 }

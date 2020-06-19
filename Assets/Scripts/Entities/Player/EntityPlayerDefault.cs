@@ -1,11 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Animator))]
 public class EntityPlayerDefault : Entity
 {
+    protected enum ButtonState
+    {
+        DOWN,
+        UP
+    }
+
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
@@ -41,6 +49,7 @@ public class EntityPlayerDefault : Entity
     [SerializeField] protected float verticalLaunchOffset = 0.5f;
 
     // State
+    protected ButtonState _buttonStateRanged;
 
     // Cache
     protected Animator myAnimator;
@@ -64,6 +73,9 @@ public class EntityPlayerDefault : Entity
     {
         base.DefaultGlobals();
 
+        // State
+        _buttonStateRanged = ButtonState.UP;
+
         // Cache
         myAnimator = GetComponent<Animator>();
         checkpointManager = FindObjectOfType<CheckpointManager>();
@@ -84,7 +96,7 @@ public class EntityPlayerDefault : Entity
         SetEntityForPlayerCameraToFollow(transform);
 
         // Players should start the game being able to control the player.
-        SetControllerConfigs(new ControllerConfigs(true, this, true));
+        SetControllerConfigs(new ControllerConfigs(true, this, false));
     }
 
     /* 
@@ -134,24 +146,44 @@ public class EntityPlayerDefault : Entity
      * character again.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleRanged(Vector2 cursorDir)
+    public override void HandleRangedDown(Vector2 cursorDir)
     {
-        // Do not allow the player to move after launching the spirit
-        FreezePlayer();
+        if (_buttonStateRanged == ButtonState.UP)
+        {
+            // Do not allow the player to move after launching the spirit
+            FreezePlayer();
 
-        // Instantiate the detached spirit into the hierarchy as a child of
-        // player GameObject.
-        GameObject spiritLaunched = Instantiate(
-            spirit,
-            transform.position + new Vector3(0f, verticalLaunchOffset, 0f),
-            Quaternion.identity,
-            transform
-        ) as GameObject;
+            // Enable cursor for aiming spirit before launch while still allow controller.
+            SetControllerConfigs(new ControllerConfigs(true, this, true));
+            this._xAxisEnabled = false;
 
-        Rigidbody2D spiritRigidBody = spiritLaunched.gameObject.GetComponent<Rigidbody2D>();
+            _buttonStateRanged = ButtonState.DOWN;
+        }
+    }
 
-        // Launch the spirit towards where the joystick was aiming
-        spiritRigidBody.velocity += cursorDir * launchPower;
+    public override void HandleRangedUp(Vector2 cursorDir)
+    {
+        if (_buttonStateRanged == ButtonState.DOWN)
+        {
+            // Instantiate the detached spirit into the hierarchy as a child of
+            // player GameObject.
+            GameObject spiritLaunched = Instantiate(
+                spirit,
+                transform.position + new Vector3(0f, verticalLaunchOffset, 0f),
+                Quaternion.identity,
+                transform
+            ) as GameObject;
+
+            Rigidbody2D spiritRigidBody = spiritLaunched.gameObject.GetComponent<Rigidbody2D>();
+
+            // Launch the spirit towards where the joystick was aiming
+            spiritRigidBody.velocity += cursorDir * launchPower;
+
+            // Disable cursor for spirit after launch. Continue to disable controller.
+            SetControllerConfigs(new ControllerConfigs(false, this,  false));
+
+            _buttonStateRanged = ButtonState.UP;
+        }
     }
 
     /* 
@@ -162,7 +194,7 @@ public class EntityPlayerDefault : Entity
      * 2. Set player camera.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleSpecial(Vector2 cursorDir)
+    public override void HandleSpecialDown(Vector2 cursorDir)
     {
         // If teleport point is still valid, teleport to location
         // and destroy the teleport point.

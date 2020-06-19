@@ -50,7 +50,7 @@ public class EntityEnemyNormal : Entity
      * NOTE: This function will only be called when user controls the enemy.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleRanged(Vector2 cursorPos)
+    public override void HandleRangedDown(Vector2 cursorPos)
     {
         GiveUserControlOfPlayer();
     }
