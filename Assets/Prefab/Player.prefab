@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 3
-  _maxRunSpeed: 15
+  _maxRunSpeed: 25
   _runAcceleration: 2
   _jumpSpeed:
   - 30
@@ -166,6 +166,7 @@ MonoBehaviour:
   _teleportPointPrefab: {fileID: 4658823631836370141, guid: daabcb4574146674280934b6c1822422,
     type: 3}
   _health: 0
+  _controllerState: {fileID: 11400000, guid: e30561c6f0253a348bf92b7dcfcb1462, type: 2}
   spirit: {fileID: 4022419655058528293, guid: da86196f508cb614cbb98e7d92272137, type: 3}
   launchPower: 20
   verticalLaunchOffset: 0.5

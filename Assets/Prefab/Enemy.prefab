@@ -156,17 +156,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14d1f7f5df18fd3419adb3cce97155a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1
-  maxRunSpeed: 15
-  runAcceleration: 0.5
-  jumpSpeed:
-  - 30
-  - 30
-  fallSpeed: 300
-  secondsBetweenDoubleJump: 0.1
-  spriteFacingRight: 0
-  teleportPointPrefab: {fileID: 0}
-  health: 0
+  _maxHealth: 1
+  _maxRunSpeed: 15
+  _runAcceleration: 2
+  _jumpSpeed: []
+  _fallSpeed: 240
+  _secondsBetweenDoubleJump: 0.1
+  _spriteFacingRight: 1
+  _teleportPointPrefab: {fileID: 0}
+  _health: 0
+  _controllerState: {fileID: 11400000, guid: e30561c6f0253a348bf92b7dcfcb1462, type: 2}
 --- !u!61 &412958858
 BoxCollider2D:
   m_ObjectHideFlags: 0

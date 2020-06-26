@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using MyBox;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEditor;
@@ -51,8 +52,10 @@ public class EntityPlayerDefault : Entity
     // State
     protected ButtonState _buttonStateRanged;
 
-    // Cache
+    // Component cache
     protected Animator myAnimator;
+
+    // Object cache
     protected CheckpointManager checkpointManager;
 
     // **********************************************************************
@@ -96,17 +99,19 @@ public class EntityPlayerDefault : Entity
         SetEntityForPlayerCameraToFollow(transform);
 
         // Players should start the game being able to control the player.
-        SetControllerConfigs(new ControllerConfigs(true, this, false));
+        _controllerState.entityToControl = this;
+        _controllerState.cursorEnable = false;
+        _controllerState.inputEn.all = true;
     }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: FreezePlayer
+     * SUMMARY: StopRunning
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    protected override void FreezePlayer()
+    protected override void StopRunning()
     {
-        base.FreezePlayer();
+        base.StopRunning();
         myAnimator.SetBool(GlobalConfigs.ANIMATION_PLAYER_RUNNING, false);
     }
 
@@ -121,7 +126,9 @@ public class EntityPlayerDefault : Entity
     protected override void Die()
     {
         // Disable all components set up during instantiation
-        SetControllerConfigs(new ControllerConfigs(false, null, false));
+        _controllerState.entityToControl = null;
+        _controllerState.cursorEnable = false;
+        _controllerState.inputEn.all = false;
         SetEntityForPlayerCameraToFollow(null);
 
         // Play death animation, sound effect
@@ -151,11 +158,13 @@ public class EntityPlayerDefault : Entity
         if (_buttonStateRanged == ButtonState.UP)
         {
             // Do not allow the player to move after launching the spirit
-            FreezePlayer();
+            StopRunning();
+            _controllerState.inputEn.jsLeftX = false;
+            _controllerState.inputEn.jsLeftY = false;
+            _controllerState.inputEn.bA = false;
 
-            // Enable cursor for aiming spirit before launch while still allow controller.
-            SetControllerConfigs(new ControllerConfigs(true, this, true));
-            this._xAxisEnabled = false;
+            // Enable cursor for aiming spirit before launch.
+            _controllerState.cursorEnable = true;
 
             _buttonStateRanged = ButtonState.DOWN;
         }
@@ -180,7 +189,8 @@ public class EntityPlayerDefault : Entity
             spiritRigidBody.velocity += cursorDir * launchPower;
 
             // Disable cursor for spirit after launch. Continue to disable controller.
-            SetControllerConfigs(new ControllerConfigs(false, this,  false));
+            _controllerState.cursorEnable = false;
+            _controllerState.inputEn.all = false;
 
             _buttonStateRanged = ButtonState.UP;
         }

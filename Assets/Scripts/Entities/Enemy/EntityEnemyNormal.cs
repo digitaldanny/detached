@@ -76,7 +76,9 @@ public class EntityEnemyNormal : Entity
         spirit.GiveUpControlToEntity(this);
 
         // Set the enemy as the entity to control
-        SetControllerConfigs(new ControllerConfigs(true, this, true));
+        _controllerState.entityToControl = this;
+        _controllerState.cursorEnable = true;
+        _controllerState.inputEn.all = true;
     }
 
     private void GiveUserControlOfPlayer()
@@ -85,6 +87,8 @@ public class EntityEnemyNormal : Entity
         SetEntityForPlayerCameraToFollow(player);
 
         // Set player as the entity to control
-        SetControllerConfigs(new ControllerConfigs(true, player.GetComponent<Entity>(), true));
+        _controllerState.entityToControl = player.GetComponent<Entity>();
+        _controllerState.cursorEnable = true;
+        _controllerState.inputEn.all = true;
     }
 }

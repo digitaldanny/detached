@@ -35,7 +35,11 @@ public class Spirit : Entity
         base.DefaultGlobals();
 
         // Make player controls connect to spirit entity
-        SetControllerConfigs(new ControllerConfigs(true, this, false));
+        _controllerState.entityToControl = this;
+        _controllerState.cursorEnable = false;
+        _controllerState.inputEn.all = false;
+        _controllerState.inputEn.jsLeftY = true;
+        _controllerState.inputEn.bY = true;
 
         // set up states
         _isGrounded = false;
@@ -146,11 +150,8 @@ public class Spirit : Entity
      * This actions should not do anything for the Spirit class.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    public override void HandleRun(float controlThrow) { return; }
-    public override void HandleJump() { return; }
-    public override void HandleSpecialDown(Vector2 cursorDir) { return; }
     protected override void FallMultiplier() { return; }
-    protected override void FreezePlayer() { return; }
+    protected override void StopRunning() { return; }
     public override void HandleDamage(DamageUnit du) { return; }
 
 
@@ -181,8 +182,9 @@ public class Spirit : Entity
         cameraManager.SetPlayerCamera(true);
 
         // Give new entity control of the user input
-        SetControllerConfigs(new ControllerConfigs(true, entityGainingControl, false));
-        entityGainingControl.xAxisEnabled = true; // reenable entity control of xAxis
+        _controllerState.entityToControl = entityGainingControl;
+        _controllerState.cursorEnable = false;
+        _controllerState.inputEn.all = true;
 
         Destroy(gameObject, 0f);
     }

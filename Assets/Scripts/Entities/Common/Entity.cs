@@ -1,53 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
+using MyBox;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(SpriteRenderer))]
 public class Entity : MonoBehaviour
 {
-
-    // **********************************************************************
-    //                          CLASS STRUCTURES
-    // **********************************************************************
-
-    /*
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: ControllerConfigs
-     * @controllerEnabled
-     *  
-     * @entityToControl
-     * @cursorEnabled
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected class ControllerConfigs
-    {
-        public bool controllerEnabled;
-        public Entity entityToControl;
-        public bool cursorEnabled;
-
-        // default constructor
-        public ControllerConfigs()
-        {
-            controllerEnabled = false;
-            entityToControl = null;
-            cursorEnabled = false;
-        }
-
-        // parameter constructor
-        public ControllerConfigs(
-            bool controllerEnabled,
-            Entity entityToControl,
-            bool cursorEnabled)
-        {
-            this.controllerEnabled = controllerEnabled;
-            this.entityToControl = entityToControl;
-            this.cursorEnabled = cursorEnabled;
-        }
-    }
-
-
     // **********************************************************************
     //                          CLASS PARAMETERS
     // **********************************************************************
@@ -112,12 +71,14 @@ public class Entity : MonoBehaviour
     protected float _allowedJumpTime;
     protected GameObject _prevTeleportPoint;
     [SerializeField] protected int _health;
-    protected bool _xAxisEnabled;
 
     // Cache
     protected Rigidbody2D _myRigidbody;
     protected Collider2D _myCollider2D;
     protected SpriteRenderer _mySpriteRenderer;
+
+    [Header("SCRIPTABLE OBJ ASSIGNMENTS")]
+    [MustBeAssigned][SerializeField] protected ControllerState _controllerState;
 
     // **********************************************************************
     //                          GETTERS / SETTERS
@@ -135,12 +96,6 @@ public class Entity : MonoBehaviour
         set { _health = value; }
     }
 
-    public bool xAxisEnabled
-    {
-        get => _xAxisEnabled;
-        set { _xAxisEnabled = value; }
-    }
-
     // **********************************************************************
     //                 MONO BEHAVIOUR CLASS OVERLOAD METHODS
     // **********************************************************************
@@ -156,8 +111,6 @@ public class Entity : MonoBehaviour
         _maxNumberJumps = _jumpSpeed.Length;
         _allowedJumpTime = 0;
         _health = _maxHealth;
-
-        _xAxisEnabled = true;
 
         // Set up cache
         _myRigidbody = GetComponent<Rigidbody2D>();
@@ -217,14 +170,13 @@ public class Entity : MonoBehaviour
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: FreezePlayer
+     * SUMMARY: StopRunning
      * Sets the player's X velocity to 0 so player isn't stuck moving
      * left or right while frozen.
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
-    protected virtual void FreezePlayer()
+    protected virtual void StopRunning()
     {
-        SetControllerConfigs(new ControllerConfigs(false, this, true));
         _myRigidbody.velocity = new Vector2(0f, _myRigidbody.velocity.y);
     }
 
@@ -235,27 +187,24 @@ public class Entity : MonoBehaviour
      */
     public virtual void HandleRun(float controlThrow)
     {
-        if (_xAxisEnabled)
+        // Calculate new velocity using acceleration with a max run speed
+        float xVelocity = _myRigidbody.velocity.x + controlThrow * this._runAcceleration;
+        float xVelocityClamped = Mathf.Clamp(xVelocity, -1f * this._maxRunSpeed, this._maxRunSpeed);
+        Vector2 playerVelocity = new Vector2(xVelocityClamped, _myRigidbody.velocity.y);
+
+        _myRigidbody.velocity = playerVelocity; // assign new run speed to player
+
+        bool playerHasHorizontalSpeed = Mathf.Abs(_myRigidbody.velocity.x) >= Mathf.Epsilon;
+
+        // check if player's sprite should be flipped to face direction it is moving
+        if (playerHasHorizontalSpeed)
         {
-            // Calculate new velocity using acceleration with a max run speed
-            float xVelocity = _myRigidbody.velocity.x + controlThrow * this._runAcceleration;
-            float xVelocityClamped = Mathf.Clamp(xVelocity, -1f * this._maxRunSpeed, this._maxRunSpeed);
-            Vector2 playerVelocity = new Vector2(xVelocityClamped, _myRigidbody.velocity.y);
-
-            _myRigidbody.velocity = playerVelocity; // assign new run speed to player
-
-            bool playerHasHorizontalSpeed = Mathf.Abs(_myRigidbody.velocity.x) >= Mathf.Epsilon;
-
-            // check if player's sprite should be flipped to face direction it is moving
-            if (playerHasHorizontalSpeed)
-            {
-                // Sprite direction is implemented using XNOR boolean logic
-                // XNOR Truth table reference: https://en.scratch-wiki.info/wiki/Truth_Table
-                bool A = Mathf.Sign(_myRigidbody.velocity.x) <= 0.0f;
-                bool B = this._spriteFacingRight;
-                _mySpriteRenderer.flipX = A == B; // XNOR logic
-            }
-        }    
+            // Sprite direction is implemented using XNOR boolean logic
+            // XNOR Truth table reference: https://en.scratch-wiki.info/wiki/Truth_Table
+            bool A = Mathf.Sign(_myRigidbody.velocity.x) <= 0.0f;
+            bool B = this._spriteFacingRight;
+            _mySpriteRenderer.flipX = A == B; // XNOR logic
+        }
     }
 
     /* 
@@ -322,18 +271,13 @@ public class Entity : MonoBehaviour
     IEnumerator DisableControlsForSeconds(float stunTime)
     {
         // Disable entity controls
-        ControllerConfigs configs = new ControllerConfigs();
-        configs.controllerEnabled = false;
-        configs.entityToControl = this;
-        configs.cursorEnabled = true;
-        SetControllerConfigs(configs);
+        _controllerState.inputEn.all = false;
 
         // wait for stun time
         yield return new WaitForSeconds(stunTime);
 
         // re-enable entity controls
-        configs.controllerEnabled = true;
-        SetControllerConfigs(configs);
+        _controllerState.inputEn.all = true;
     }
 
     /* 
@@ -439,27 +383,6 @@ public class Entity : MonoBehaviour
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
     */
     protected virtual void Die() { return; }
-
-    // **********************************************************************
-    //                 METHODS WITH EXTERNAL DEPENDENCIES
-    // **********************************************************************
-
-    /* 
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-     * SUMMARY: SetControllerConfigs
-     * Sets various user controller properties.
-     * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
-    */
-    protected void SetControllerConfigs(ControllerConfigs configs)
-    {
-        UserController controller = FindObjectOfType<UserController>();
-        if (controller)
-        {
-            controller.SetControllable(configs.controllerEnabled);
-            controller.SetEntity(configs.entityToControl);
-            controller.SetCursorEnable(configs.cursorEnabled);
-        }
-    }
 
     /* 
      * +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
